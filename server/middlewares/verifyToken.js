@@ -21,6 +21,18 @@ const verifyAT = asyncHandler(async (req, res, next) => {
     });
   }
 });
+
+const isAdmin = asyncHandler((req, res, next) => {
+  const { role } = req.user;
+  if (role !== "admin")
+    return res.status(401).json({
+      success: false,
+      mes: " REQUIRE ADMIN ROLE",
+    });
+  next();
+});
+
 module.exports = {
   verifyAT,
+  isAdmin,
 };
