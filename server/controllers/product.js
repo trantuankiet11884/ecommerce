@@ -97,12 +97,13 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const ratings = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   const { star, comment, pid } = req.body;
-  if (!star || !pid) throw new Error("Missing inputs");
+
+  if (!star || !pid) throw new Error("Missing values");
   const ratingProduct = await Product.findById(pid);
-  const alreadyRating = ratingProduct?.ratings.find(
+  const alreadyRating = ratingProduct?.ratings?.find(
     (el) => el.postedBy === _id
   );
-  console.log(alreadyRating);
+
   if (alreadyRating) {
     await Product.updateOne(
       {
@@ -122,8 +123,21 @@ const ratings = asyncHandler(async (req, res) => {
       { new: true }
     );
   }
+
+  const updatedProduct = await Product.findById(pid);
+  const ratingCount = updatedProduct.ratings.length;
+  const sumRatings = updatedProduct.ratings.reduce(
+    (sum, el) => sum + +el.star,
+    0
+  );
+  updatedProduct.totalRatings =
+    Math.round((sumRatings * 10) / ratingCount) / 10;
+
+  await updatedProduct.save();
+
   return res.status(200).json({
     status: true,
+    updatedProduct,
   });
 });
 
