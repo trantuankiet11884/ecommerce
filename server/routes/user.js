@@ -10,6 +10,8 @@ router.post("/logout", ctrls.logout);
 router.get("/", [verifyAT, isAdmin], ctrls.getUsers);
 router.delete("/", [verifyAT, isAdmin], ctrls.deleteUser);
 router.put("/current", [verifyAT], ctrls.updateUser);
+router.put("/address", [verifyAT], ctrls.updateUserAddress);
+router.put("/cart", [verifyAT], ctrls.updateCart);
 router.put("/:uid", [verifyAT, isAdmin], ctrls.updateUserByAdmin);
 
 module.exports = router;

@@ -3,14 +3,14 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET,
+  cloud_name: "dmzfqcw3s",
+  api_key: "468934992892697",
+  api_secret: "TB2XaPMB0oHH1hg_JycrpdR1KQ0",
 });
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  allowedFormats: ["jpg", "png"],
+  allowedFormats: ["jpeg", "png", "jpg"],
   params: {
     folder: "ecommerce",
   },

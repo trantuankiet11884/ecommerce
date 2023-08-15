@@ -223,6 +223,81 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
   });
 });
 
+const updateUserAddress = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.user;
+    const response = await User.findByIdAndUpdate(
+      id,
+      { $push: { address: req.body.address } },
+      {
+        new: true,
+      }
+    ).select("-password -role -refreshToken");
+
+    if (!response) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      updatedUser: response,
+    });
+  } catch (error) {
+    console.error("Error updating user address:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error updating user address: " + error.message,
+    });
+  }
+});
+
+const updateCart = asyncHandler(async (req, res) => {
+  //
+  const { id } = req.user;
+  const { pid, quantity, color } = req.body;
+  if (!pid || !quantity || !color) throw new Error("Missing inputs");
+  const user = await User.findById(id).select("cart");
+  const alreadyProduct = user?.cart?.find(
+    (el) => el.product.toString() === pid
+  );
+  if (alreadyProduct) {
+    if (alreadyProduct.color === color) {
+      const response = await User.updateOne(
+        { cart: { $elemMatch: alreadyProduct } },
+        { $set: { "cart.$.quantity": quantity } },
+        { new: true }
+      );
+      return res.status(200).json({
+        success: response ? true : false,
+        updatedUser: response ? response : "Some thing went wrong",
+      });
+    } else {
+      const response = await User.findByIdAndUpdate(
+        id,
+        { $push: { cart: { product: pid, quantity, color } } },
+        { new: true }
+      );
+      return res.status(200).json({
+        success: response ? true : false,
+        updatedUser: response ? response : "Some thing went wrong",
+      });
+    }
+  } else {
+    const response = await User.findByIdAndUpdate(
+      id,
+      { $push: { cart: { product: pid, quantity, color } } },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: response ? true : false,
+      updatedUser: response ? response : "Some thing went wrong",
+    });
+  }
+});
+
 module.exports = {
   register,
   login,
@@ -233,4 +308,6 @@ module.exports = {
   deleteUser,
   updateUser,
   updateUserByAdmin,
+  updateUserAddress,
+  updateCart,
 };
