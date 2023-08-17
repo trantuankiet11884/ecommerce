@@ -3,8 +3,15 @@ const connectDB = require("./config/db.js");
 const initRoutes = require("./routes/index.js");
 require("dotenv").config();
 const cookie = require("cookie-parser");
+const cors = require("cors");
 
 const app = express();
+app.use(
+  cors({
+    origin: process.env.CLIENT,
+    methods: ["POST", "PUT", "GET", "DELETE"],
+  })
+);
 app.use(cookie());
 const PORT = process.env.PORT || 8080;
 
