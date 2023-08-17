@@ -31,15 +31,15 @@ const getBlogs = asyncHandler(async (req, res) => {
 });
 
 const likeBlog = asyncHandler(async (req, res) => {
-  const { _id } = req.user;
+  const { id } = req.user;
   const { bid } = req.params;
   if (!bid) throw new Error("Missing values");
   const blog = await Blog.findById(bid);
-  const alreadyDisliked = blog?.likes?.find((el) => el.toString() === _id);
+  const alreadyDisliked = blog?.likes?.find((el) => el.toString() === id);
   if (alreadyDisliked) {
     const response = await Blog.findByIdAndUpdate(
       bid,
-      { $pull: { dislikes: _id } },
+      { $pull: { dislikes: id } },
       { new: true }
     );
     return res.status(200).json({
@@ -47,11 +47,11 @@ const likeBlog = asyncHandler(async (req, res) => {
       rs: response,
     });
   }
-  const isLiked = blog?.likes.find((el) => el.toString() === _id);
+  const isLiked = blog?.likes.find((el) => el.toString() === id);
   if (isLiked) {
     const response = await Blog.findByIdAndUpdate(
       bid,
-      { $pull: { likes: _id } },
+      { $pull: { likes: id } },
       { new: true }
     );
     return res.status(200).json({
@@ -61,7 +61,7 @@ const likeBlog = asyncHandler(async (req, res) => {
   } else {
     const response = await Blog.findByIdAndUpdate(
       bid,
-      { $push: { likes: _id } },
+      { $push: { likes: id } },
       { new: true }
     );
     return res.status(200).json({
@@ -72,15 +72,15 @@ const likeBlog = asyncHandler(async (req, res) => {
 });
 
 const dislikeBlog = asyncHandler(async (req, res) => {
-  const { _id } = req.user;
+  const { id } = req.user;
   const { bid } = req.params;
   if (!bid) throw new Error("Missing values");
   const blog = await Blog.findById(bid);
-  const alreadyLiked = blog?.likes?.find((el) => el.toString() === _id);
+  const alreadyLiked = blog?.likes?.find((el) => el.toString() === id);
   if (alreadyLiked) {
     const response = await Blog.findByIdAndUpdate(
       bid,
-      { $pull: { likes: _id } },
+      { $pull: { likes: id } },
       { new: true }
     );
     return res.status(200).json({
@@ -88,11 +88,11 @@ const dislikeBlog = asyncHandler(async (req, res) => {
       rs: response,
     });
   }
-  const isDisliked = blog?.dislikes?.find((el) => el.toString() === _id);
+  const isDisliked = blog?.dislikes?.find((el) => el.toString() === id);
   if (isDisliked) {
     const response = await Blog.findByIdAndUpdate(
       bid,
-      { $pull: { dislikes: _id } },
+      { $pull: { dislikes: id } },
       { new: true }
     );
     return res.status(200).json({
@@ -102,7 +102,7 @@ const dislikeBlog = asyncHandler(async (req, res) => {
   } else {
     const response = await Blog.findByIdAndUpdate(
       bid,
-      { $push: { dislikes: _id } },
+      { $push: { dislikes: id } },
       { new: true }
     );
     return res.status(200).json({
