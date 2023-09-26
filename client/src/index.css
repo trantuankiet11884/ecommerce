@@ -7,3 +7,36 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+button.slick-next {
+  right: 80px;
+}
+
+button.slick-prev {
+  left: 20px;
+  z-index: 9999999;
+}
+
+button.slick-next::before {
+  content: "\276F";
+  color: #808080;
+  background-color: #fff;
+  width: 80px;
+  height: 80px;
+  font-size: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button.slick-prev::before {
+  content: "\276E";
+  color: #808080;
+  background-color: #fff;
+  width: 80px;
+  height: 80px;
+  font-size: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

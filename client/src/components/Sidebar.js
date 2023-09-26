@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { createSlug } from "../utils/fn.js";
 import { useDispatch, useSelector } from "react-redux";
-import { getCategories } from "../store/asyncAction";
+import { getCategories } from "../store/app/asyncAction";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
