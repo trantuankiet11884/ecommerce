@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { apiGetProducts } from "../apis/product";
-import SliderProduct from "./SliderProduct";
 import { getNewProducts } from "../store/products/asyncAction";
 import { useDispatch, useSelector } from "react-redux";
+import CustomeSlider from "./CustomeSlider";
 
 const tabs = [
   { id: 0, name: "best sellers", sort: "-sold" },
@@ -13,7 +13,7 @@ const BestSellers = () => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState(0);
   const [products, setProducts] = useState([]);
-  // const { newProducts } = useSelector((state) => state.products);
+  const { newProducts } = useSelector((state) => state.products);
   useEffect(() => {
     const fetchData = async () => {
       const response = await apiGetProducts({ sort: tabs[activeTab].sort });
@@ -41,7 +41,7 @@ const BestSellers = () => {
         ))}
       </div>
       <div className="mt-4 mx-[-10px]">
-        <SliderProduct products={products} activeTab={activeTab} />
+        <CustomeSlider products={products} activeTab={activeTab} />
       </div>
       <div className="w-full flex gap-4 mt-4">
         <img

@@ -9,3 +9,6 @@ export { default as CountDown } from "./CountDown.js";
 export { default as FeatureProducts } from "./FeatureProducts.js";
 export { default as ProductCard } from "./ProductCard.js";
 export { default as SliderProduct } from "./SliderProduct.js";
+export { default as CustomeSlider } from "./CustomeSlider.js";
+export { default as TopHeader } from "./TopHeader.js";
+export { default as Footer } from "./Footer.js";

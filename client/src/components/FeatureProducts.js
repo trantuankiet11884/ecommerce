@@ -27,7 +27,7 @@ const FeatureProducts = () => {
       <div className="flex flex-wrap mt-4">
         {products?.map((item) => (
           <ProductCard
-            key={item.id}
+            key={item._id}
             image={item.thumbnail}
             title={item.title}
             totalRatings={item.totalRatings}

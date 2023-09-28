@@ -8,7 +8,11 @@ const ProductCard = ({ image, price, totalRatings, title }) => {
         <img src={image} alt="products" className="w-[90px] object-contain" />
         <div className="flex flex-col gap-1 mt-4 items-start w-full">
           <span className="line-clamp-1">{title}</span>
-          <span className="flex h-4">{renderStar(totalRatings, 12)}</span>
+          <span className="flex h-4">
+            {renderStar(totalRatings, 12)?.map((el, idx) => (
+              <span key={idx}>{el}</span>
+            ))}
+          </span>
           <span>{`${formatMoney(price)} VNĐ`}</span>
         </div>
       </div>

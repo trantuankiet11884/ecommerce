@@ -4,7 +4,7 @@ import * as actions from "./asyncAction.js";
 export const appSlice = createSlice({
   name: "app",
   initialState: {
-    categories: null,
+    categories: [],
     loading: false,
     error: "",
   },

@@ -68,7 +68,9 @@ const DealDaily = () => {
           {dealdaily?.title}
         </span>
         <span className="flex h-4" key={`rating_${dealdaily?.id}`}>
-          {renderStar(dealdaily?.totalRatings, 20)}
+          {renderStar(dealdaily?.totalRatings, 20)?.map((el, idx) => (
+            <span key={idx}>{el}</span>
+          ))}
         </span>
         <span key={`price_${dealdaily?.id}`}>{`${formatMoney(
           dealdaily?.price
