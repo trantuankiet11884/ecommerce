@@ -5,12 +5,17 @@ module.exports = {
     fontFamily: {
       main: ["Poppins", "sans-serif"],
     },
+    listStyleType: {
+      square: "square",
+      roman: "upper-roman",
+    },
     extend: {
       width: {
         main: "1024px",
       },
       backgroundColor: {
         main: "#ee3131",
+        overlay: "rgba(0,0,0,0.3)",
       },
       colors: {
         main: "#ee3131",
@@ -41,5 +46,5 @@ module.exports = {
       },
     },
   },
-  plugins: ["@tailwindcss/line-clamp"],
+  plugins: [require("@tailwindcss/line-clamp"), require("@tailwindcss/forms")],
 };

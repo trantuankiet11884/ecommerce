@@ -1,4 +1,4 @@
-import axios from "../utils/axios.js";
+import axios from "utils/axios";
 
 export const apiGetCategories = () =>
   axios({

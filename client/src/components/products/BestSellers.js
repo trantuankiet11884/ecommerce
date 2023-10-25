@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { apiGetProducts } from "../apis/product";
-import { getNewProducts } from "../store/products/asyncAction";
+import { apiGetProducts } from "apis/product";
+import { getNewProducts } from "store/products/asyncAction";
 import { useDispatch, useSelector } from "react-redux";
-import CustomeSlider from "./CustomeSlider";
+import { CustomeSlider } from "components";
 
 const tabs = [
   { id: 0, name: "best sellers", sort: "-sold" },

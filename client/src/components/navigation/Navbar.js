@@ -1,5 +1,5 @@
 import React from "react";
-import { navigation } from "../utils/constant.js";
+import { navigation } from "utils/constant.js";
 import { NavLink } from "react-router-dom";
 
 const Navbar = () => {

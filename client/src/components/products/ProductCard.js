@@ -1,5 +1,5 @@
 import React from "react";
-import { formatMoney, renderStar } from "../utils/fn";
+import { formatMoney, renderStar } from "utils/fn";
 
 const ProductCard = ({ image, price, totalRatings, title }) => {
   return (

@@ -10,6 +10,7 @@ app.use(
   cors({
     origin: process.env.CLIENT,
     methods: ["POST", "PUT", "GET", "DELETE"],
+    credentials: true,
   })
 );
 app.use(cookie());

@@ -1,19 +1,20 @@
 import React, { useState } from "react";
-import { formatMoney, renderStar } from "../utils/fn";
-import { news, trending } from "../assets/js";
-import SelectOption from "./SelectOption";
-import icons from "../utils/icons";
+import { formatMoney, renderStar } from "utils/fn";
+import { news, trending } from "assets/js";
+import { SelectOption } from "components";
+import icons from "utils/icons";
 import { Link } from "react-router-dom";
-import path from "../utils/path";
 const { AiFillEye, AiOutlineMenu, BsFillSuitHeartFill } = icons;
 
-const Product = ({ productsData, isNew, pid }) => {
+const Product = ({ productsData, isNew, pid, normal }) => {
   const [isShowOption, setIsShowOption] = useState(false);
   return (
     <div className="w-full text-sm px-[10px]" key={productsData?.id}>
       <Link
-        to={`/${path.DETAILS_PRODUCT}/${productsData?._id}/${productsData?.title}`}
-        className="w-full border p-4 flex-col items-center"
+        to={`/${productsData?.category.toLowerCase()}/${productsData?._id}/${
+          productsData?.title
+        }`}
+        className="w-full p-4 flex-col items-center"
         onMouseEnter={(e) => {
           e.stopPropagation();
           setIsShowOption(true);
@@ -36,11 +37,13 @@ const Product = ({ productsData, isNew, pid }) => {
             alt="product"
             className="w-[200px] h-[200px] object-cover"
           />
-          <img
-            src={isNew ? news : trending}
-            alt=""
-            className="absolute w-[70px] top-[-16px] right-[-16px] object-contain"
-          />
+          {!normal && (
+            <img
+              src={isNew ? news : trending}
+              alt=""
+              className="absolute w-[70px] top-[-16px] right-[-16px] object-contain"
+            />
+          )}
         </div>
         <div className="flex flex-col gap-1 mt-4 items-start w-full">
           <span className="flex h-4">

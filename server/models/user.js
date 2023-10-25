@@ -17,10 +17,13 @@ var userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    avatar: {
+      type: String,
+    },
     mobile: {
       type: String,
-      required: true,
       unique: true,
+      required: true,
     },
     password: {
       type: String,
@@ -28,7 +31,8 @@ var userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "user",
+      enum: [0, 1],
+      default: 0,
     },
     cart: [
       {
@@ -60,6 +64,9 @@ var userSchema = new mongoose.Schema(
     passwordResetExpires: {
       type: String,
     },
+    registerToken: {
+      type: String,
+    },
   },
   {
     timestamps: true,
@@ -77,6 +84,15 @@ userSchema.pre("save", async function (next) {
 userSchema.methods = {
   isCorrectPassword: async function (password) {
     return await bcrypt.compare(password, this.password);
+  },
+  createPasswordChangedToken: function () {
+    const restToken = crypto.randomBytes(32).toString("hex");
+    this.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(restToken)
+      .digest("hex");
+    this.passwordResetExpires = Date.now() + 15 * 60 * 1000;
+    return restToken;
   },
 };
 

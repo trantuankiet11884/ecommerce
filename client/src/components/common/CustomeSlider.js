@@ -1,7 +1,8 @@
 import React, { memo } from "react";
-import Product from "./Product";
-import { v4 as uuidv4 } from "uuid";
+
 import Slider from "react-slick";
+import { Product } from "components";
+import { v4 as uuidv4 } from "uuid";
 
 const settings = {
   dots: false,
@@ -11,7 +12,7 @@ const settings = {
   slidesToScroll: 1,
 };
 
-const SliderProduct = ({ products, activeTab }) => {
+const CustomeSlider = ({ products, activeTab, normal }) => {
   return (
     <>
       {products && (
@@ -22,6 +23,7 @@ const SliderProduct = ({ products, activeTab }) => {
               pid={item.id}
               productsData={item}
               isNew={activeTab === 0 ? false : true}
+              normal={normal}
             />
           ))}
         </Slider>
@@ -30,4 +32,4 @@ const SliderProduct = ({ products, activeTab }) => {
   );
 };
 
-export default memo(SliderProduct);
+export default memo(CustomeSlider);

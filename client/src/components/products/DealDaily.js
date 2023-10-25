@@ -1,8 +1,8 @@
 import React, { memo, useEffect, useState } from "react";
-import icons from "../utils/icons";
-import { apiGetProducts } from "../apis/product";
-import { formatMoney, renderStar } from "../utils/fn";
-import CountDown from "./CountDown";
+import icons from "utils/icons";
+import { apiGetProducts } from "apis/product";
+import { formatMoney, renderStar } from "utils/fn";
+import { CountDown } from "components";
 import { DateTime } from "luxon";
 
 const { AiFillStar, AiOutlineMenu } = icons;

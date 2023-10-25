@@ -3,24 +3,81 @@ const User = require("../models/user.js");
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../utils/sendMail.js");
+const makeToken = require("uniqid");
+const crypto = require("crypto");
+
+// const register = asyncHandler(async (req, res) => {
+//   const { email, password, firstName, lastName } = req.body;
+//   if (!email || !password || !firstName || !lastName)
+//     return res.status(400).json({
+//       success: false,
+//       message: "Missing values",
+//     });
+
+//   const user = await User.findOne({ email });
+//   if (user) throw new Error("Email has existed!");
+//   else {
+//     const newUser = await User.create(req.body);
+//     return res.status(200).json({
+//       success: newUser ? true : false,
+//       message: newUser ? "Register is successfully" : "Something wrongs...",
+//     });
+//   }
+// });
 
 const register = asyncHandler(async (req, res) => {
-  const { email, password, firstName, lastName } = req.body;
-  if (!email || !password || !firstName || !lastName)
+  const { email, password, firstName, lastName, mobile } = req.body;
+  if (!email || !password || !firstName || !lastName || !mobile)
     return res.status(400).json({
       success: false,
-      mes: "Missing values",
+      message: "Missing values",
     });
 
   const user = await User.findOne({ email });
   if (user) throw new Error("Email has existed!");
   else {
-    const newUser = await User.create(req.body);
-    return res.status(200).json({
+    const token = makeToken();
+    const emailedited = btoa(email) + "@" + token;
+    const newUser = await User.create({
+      email: emailedited,
+      password,
+      firstName,
+      lastName,
+      mobile,
+    });
+    if (newUser) {
+      const html = ` <h2>Register code :</h2> </br><blockquote>${token}</blockquote>`;
+      await sendMail(email, html, "Confirm Register Account");
+    }
+    setTimeout(async () => {
+      await User.deleteOne({ email: emailedited });
+    }, [200000]);
+    return res.json({
       success: newUser ? true : false,
-      mes: newUser ? "Register is successfully" : "Something wrongs...",
+      message: newUser
+        ? "Check your email to account, pls !!!"
+        : "Something went wrongs ...",
     });
   }
+});
+
+const finalRegister = asyncHandler(async (req, res) => {
+  const cookie = req.cookies;
+  const { token } = req.params;
+  const notActivedEmail = await User.findOne({
+    email: new RegExp(`${token}$`),
+  });
+  if (notActivedEmail) {
+    notActivedEmail.email = atob(notActivedEmail?.email?.split("@")[0]);
+    notActivedEmail.save();
+  }
+
+  return res.json({
+    success: notActivedEmail ? true : false,
+    message: notActivedEmail
+      ? "Register is successfully, pls login !!!"
+      : "Something went wrongs ...",
+  });
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -28,7 +85,7 @@ const login = asyncHandler(async (req, res) => {
   if (!email || !password)
     return res.status(400).json({
       success: false,
-      mes: "Missing values",
+      message: "Missing values",
     });
 
   const response = await User.findOne({ email });
@@ -61,34 +118,41 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const getCurrent = asyncHandler(async (req, res) => {
-  // Check if req.user.id exists
+  // const { _id } = req.user;
+  // const user = await User.findById(_id).select("-refreshToken -password");
+
+  // return res.status(200).json({
+  //   success: user ? true : false,
+  //   rs: user ? user : "User not found",
+  // });
+
   if (!req.user || !req.user.id) {
     return res.status(400).json({
       success: false,
-      mes: "User ID (id) not provided",
+      message: "User ID (id) not provided",
     });
   }
 
   try {
     const user = await User.findById(req.user.id).select(
-      "-refreshToken -password -role"
+      "-refreshToken -password"
     );
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        mes: "User not found",
+        message: "User not found",
       });
     }
 
     return res.status(200).json({
       success: user ? true : false,
-      userData: user,
+      rs: user,
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      mes: "Internal server error",
+      message: "Internal server error",
     });
   }
 });
@@ -104,7 +168,7 @@ const refreshAT = asyncHandler(async (req, res) => {
     console.log("No refresh token in cookies");
     return res
       .status(400)
-      .json({ success: false, message: "No refresh token in cookies" });
+      .json({ success: false, messagesage: "No refresh token in cookies" });
   }
 
   try {
@@ -124,7 +188,7 @@ const refreshAT = asyncHandler(async (req, res) => {
   } catch (error) {
     return res
       .status(400)
-      .json({ success: false, message: "Invalid refresh token" });
+      .json({ success: false, messagesage: "Invalid refresh token" });
   }
 });
 
@@ -143,38 +207,53 @@ const logout = asyncHandler(async (req, res) => {
   });
   return res.status(200).json({
     success: true,
-    mes: "Logout is done",
+    message: "Logout is done",
   });
 });
 
-// const forgotPassword = asyncHandler(async (req, res) => {
-//   const { email } = req.query;
-//   if (!email) throw new Error("Missing email");
-//   const user = await User.findOne({ email });
-//   if (!user) throw new Error("User not found");
-//   const resetToken = user.createPasswordChangedToken();
-//   await user.save();
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) throw new Error("Missing email");
+  const user = await User.findOne({ email });
+  if (!email) throw new Error("User not found");
+  const resetToken = user.createPasswordChangedToken();
+  await user.save();
 
-//   const html = `Xin vui lòng click vào link dưới đây để thay đổi mật khẩu của bạn. Link này sẽ hết hạn sau 15 phút kể từ bây giờ. <a href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken}>Click here</a>`;
+  const html = `Xin vui lòng click vào đường dẫn dưới đây để thay đổi mật khẩu của bạn. Đường dẫn này sẽ hết hiệu lực sau 15 phút.
+  <a href=${process.env.CLIENT}/reset-password/${resetToken}>Click Here</a>
+  `;
 
-//   const data = {
-//     email: email,
-//     html,
-//   };
+  const rs = await sendMail(email, html, "Forgot Password");
+  return res.status(200).json({
+    success: true,
+    message: rs.response?.includes("OK")
+      ? "Hãy check mail của bạn !!!"
+      : "Đã có lỗi, hãy thử lại sau !!!",
+  });
+});
 
-//   try {
-//     const rs = await sendMail(data);
-//     return res.status(200).json({
-//       success: true,
-//       rs,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       success: false,
-//       message: "Error sending email",
-//     });
-//   }
-// });
+const resetPassword = asyncHandler(async (req, res) => {
+  const { password, token } = req.body;
+  if (!password || !token) throw new Error("Missings values");
+  const passwordResetToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+  const user = await User.findOne({
+    passwordResetToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  if (!user) throw new Error("Invalid reset token");
+  user.password = password;
+  user.passwordResetToken = undefined;
+  user.passwordChangedAt = Date.now();
+  user.passwordResetExpires = undefined;
+  await user.save();
+  return res.status(200).json({
+    success: user ? true : false,
+    message: user ? "Update password" : "Something went wrongs ...",
+  });
+});
 
 const getUsers = asyncHandler(async (req, res) => {
   const response = await User.find().select("-refreshToken -password -role");
@@ -237,7 +316,7 @@ const updateUserAddress = asyncHandler(async (req, res) => {
     if (!response) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        messagesage: "User not found",
       });
     }
 
@@ -249,7 +328,7 @@ const updateUserAddress = asyncHandler(async (req, res) => {
     console.error("Error updating user address:", error);
     return res.status(500).json({
       success: false,
-      message: "Error updating user address: " + error.message,
+      messagesage: "Error updating user address: " + error.messagesage,
     });
   }
 });
@@ -300,10 +379,13 @@ const updateCart = asyncHandler(async (req, res) => {
 
 module.exports = {
   register,
+  finalRegister,
   login,
   getCurrent,
   refreshAT,
   logout,
+  forgotPassword,
+  resetPassword,
   getUsers,
   deleteUser,
   updateUser,

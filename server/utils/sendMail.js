@@ -1,26 +1,26 @@
-// const nodemailer = require("nodemailer");
-// const asyncHandler = require("express-async-handler");
+const nodemailer = require("nodemailer");
+const asyncHandler = require("express-async-handler");
 
-// const sendMail = asyncHandler(async (email, html) => {
-//   let transporter = nodemailer.createTransport({
-//     host: "smtp.gmail.com",
-//     port: 587,
-//     secure: false, // true for 465, false for other ports
-//     auth: {
-//       user: process.env.EMAIL_NAME, // generated ethereal user
-//       pass: process.env.EMAIL_APP_PASSWORD, // generated ethereal password
-//     },
-//   });
+const sendMail = asyncHandler(async (email, html, subject) => {
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.EMAIL_NAME, // generated ethereal user
+      pass: process.env.EMAIL_APP_PASSWORD, // generated ethereal password
+    },
+  });
 
-//   // send mail with defined transport object
-//   let info = await transporter.sendMail({
-//     from: '"Ecommerce" <no-relply@ecommerce.com>', // sender address
-//     to: email, // list of receivers
-//     subject: "Forgot password", // Subject line
-//     html: html, // html body
-//   });
-//   console.log("Mail sent:", info);
-//   return info;
-// });
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: '"Ecommerce" <no-relply@ecommerce.com>', // sender address
+    to: email, // list of receivers
+    subject: subject, // Subject line
+    html: html, // html body
+  });
+  console.log("Mail sent:", info);
+  return info;
+});
 
-// module.exports = sendMail;
+module.exports = sendMail;

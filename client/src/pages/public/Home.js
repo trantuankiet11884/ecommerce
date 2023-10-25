@@ -6,18 +6,17 @@ import {
   FeatureProducts,
   CustomeSlider,
   Sidebar,
-} from "../../components";
+} from "components";
 import { useSelector } from "react-redux";
-import icon from "../../utils/icons";
+import icon from "utils/icons";
 const { IoIosArrowForward } = icon;
 const Home = () => {
   const { newProducts } = useSelector((state) => state.products);
   const { categories } = useSelector((state) => state.appReducer);
-
   return (
     <>
-      <div className="w-main flex">
-        <div className="flex flex-col gap-5 w-[25%] flex-auto">
+      <div className="w-main flex ">
+        <div className="flex w-main flex-col gap-5 w-[25%] flex-auto">
           <Sidebar />
           <DealDaily />
         </div>

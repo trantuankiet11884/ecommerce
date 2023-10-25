@@ -1,11 +1,13 @@
 import React from "react";
-import { logo } from "../assets/js/index.js";
-import icons from "../utils/icons.js";
+import { logo } from "assets/js/index.js";
+import icons from "utils/icons.js";
 import { Link } from "react-router-dom";
-import path from "../utils/path.js";
+import path from "utils/path.js";
+import { useSelector } from "react-redux";
 
+const { RiPhoneFill, MdEmail, BsHandbagFill, FaUserCircle } = icons;
 const Header = () => {
-  const { RiPhoneFill, MdEmail, BsHandbagFill, FaUserCircle } = icons;
+  const { current } = useSelector((state) => state.user);
   return (
     <div className="w-main h-[110px] py-[35px] flex justify-between">
       <Link to={`/${path.HOME}`}>
@@ -26,13 +28,25 @@ const Header = () => {
           </p>
           <span>Online 24/7</span>
         </div>
-        <div className="flex px-4 items-center justify-center gap-2 border-r">
-          <BsHandbagFill color="red" />{" "}
-          <span className="text-[12px]">0 item</span>
-        </div>
-        <div className="flex px-4 items-center justify-center">
-          <FaUserCircle size={24} color="red" />
-        </div>
+        {current && (
+          <>
+            <div className="flex px-4 items-center justify-center gap-2 border-r">
+              <BsHandbagFill color="red" />
+              <span className="text-[12px]">0 item</span>
+            </div>
+            <Link
+              className="flex px-4 items-center justify-center gap-1"
+              to={
+                +current?.role === 1
+                  ? `/${path.ADMIN}/${path.DASHBOARD}`
+                  : `/${path.MEMBER}/${path.PERSONAL}`
+              }
+            >
+              <FaUserCircle size={24} color="red" />
+              <span>Profile</span>
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );
