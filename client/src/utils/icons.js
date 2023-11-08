@@ -1,10 +1,11 @@
-import { RiPhoneFill, RiTruckFill } from "react-icons/ri";
-import { MdEmail } from "react-icons/md";
+import { RiPhoneFill, RiTruckFill, RiBillLine } from "react-icons/ri";
+import { MdEmail, MdGroups } from "react-icons/md";
 import {
   BsHandbagFill,
   BsFillSuitHeartFill,
   BsShieldShaded,
   BsReply,
+  BsFillTrashFill,
 } from "react-icons/bs";
 import { FaUserCircle, FaTty } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
@@ -17,12 +18,20 @@ import {
   AiOutlineLogout,
   AiFillGift,
   AiOutlineDown,
+  AiOutlineDashboard,
+  AiFillEdit,
+  AiOutlineStepBackward,
 } from "react-icons/ai";
-
+import { TbBrandProducthunt } from "react-icons/tb";
 const icons = {
   RiPhoneFill,
   AiOutlineDown,
+  BsFillTrashFill,
+  AiFillEdit,
+  TbBrandProducthunt,
+  AiOutlineStepBackward,
   MdEmail,
+  MdGroups,
   BsHandbagFill,
   FaUserCircle,
   AiFillHome,
@@ -38,6 +47,8 @@ const icons = {
   AiFillGift,
   BsReply,
   FaTty,
+  AiOutlineDashboard,
+  RiBillLine,
 };
 
 export default icons;

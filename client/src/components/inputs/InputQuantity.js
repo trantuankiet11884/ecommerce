@@ -10,7 +10,6 @@ const InputQuantity = ({ quantity, handeQuantity, handlePlusMinus }) => {
         -
       </span>
       <input
-        type="number"
         min={1}
         value={quantity}
         onChange={(e) => handeQuantity(e.target.value)}

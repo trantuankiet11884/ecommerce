@@ -2,14 +2,25 @@ const { response, query } = require("express");
 const Product = require("../models/product.js");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
+const makeSKU = require("uniqid");
 
 const createProduct = asyncHandler(async (req, res) => {
-  if (Object.keys(req.body).length === 0) throw new Error("Missing inputs");
-  if (req.body && req.body.title) req.body.slug = slugify(req.body.title);
+  const { title, price, description, brand, category, color } = req.body;
+
+  const thumbnail = req?.files?.thumbnail[0]?.path;
+  const images = req.files?.images?.map((el) => el.path);
+
+  if (!(title && price && description && brand && category && color))
+    throw new Error("Missing inputs");
+  req.body.slug = slugify(title);
+  if (thumbnail) req.body.thumbnail = thumbnail;
+  if (images) req.body.images = images;
   const newProduct = await Product.create(req.body);
   return res.status(200).json({
     success: newProduct ? true : false,
-    createdProduct: newProduct ? newProduct : "Cannot create new product !!!",
+    message: newProduct
+      ? "Created Product Successly"
+      : "Cannot create new product !!!",
   });
 });
 
@@ -54,9 +65,31 @@ const getProducts = asyncHandler(async (req, res) => {
     colorQueryObj = { $or: colorQuery };
   }
 
-  const q = { ...colorQueryObj, ...formatedQueries };
+  let queryObj = {};
 
-  let queryCommand = Product.find(q);
+  if (queries?.q) {
+    delete formatedQueries.q;
+    queryObj = {
+      $or: [
+        {
+          color: { $regex: queries.q, $options: "i" },
+        },
+        {
+          title: { $regex: queries.q, $options: "i" },
+        },
+        {
+          category: { $regex: queries.q, $options: "i" },
+        },
+        {
+          brand: { $regex: queries.q, $options: "i" },
+        },
+      ],
+    };
+  }
+
+  const qr = { ...colorQueryObj, ...formatedQueries, ...queryObj };
+
+  let queryCommand = Product.find(qr);
 
   if (req.query.sort) {
     const sortBy = req.query.sort.split(",").join(" ");
@@ -74,7 +107,7 @@ const getProducts = asyncHandler(async (req, res) => {
   queryCommand.skip(skip).limit(limit);
 
   queryCommand.then((response) => {
-    return Product.find(q)
+    return Product.find(qr)
       .countDocuments()
       .then((counts) => {
         return res.status(200).json({
@@ -91,6 +124,11 @@ const getProducts = asyncHandler(async (req, res) => {
 
 const updateProduct = asyncHandler(async (req, res) => {
   const { pid } = req.params;
+  const files = req?.files;
+  if (files?.thumbnail) req.body.thumbnail = files?.thumbnail[0]?.path;
+
+  if (files?.images) req.body.images = files?.images?.map((el) => el.path);
+
   if (req.body && req.body.title) req.body.slug = slugify(req.body.title);
   const updatedProduct = await Product.findByIdAndUpdate(pid, req.body, {
     new: true,
@@ -98,7 +136,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   return res.status(200).json({
     success: updatedProduct ? true : false,
     updatedProduct: updatedProduct
-      ? updatedProduct
+      ? "Updated Successly !!!"
       : "Cannot  update product !!!",
   });
 });
@@ -108,9 +146,9 @@ const deleteProduct = asyncHandler(async (req, res) => {
   const deletedProduct = await Product.findByIdAndDelete(pid);
   return res.status(200).json({
     success: deletedProduct ? true : false,
-    deletedProduct: deletedProduct
-      ? deletedProduct
-      : "Cannot  delete product !!!",
+    message: deletedProduct
+      ? "Deleted Successly !!!"
+      : "Cannot delete product !!!",
   });
 });
 
@@ -180,6 +218,38 @@ const uploadImagesProduct = asyncHandler(async (req, res) => {
   });
 });
 
+const addVarriants = asyncHandler(async (req, res) => {
+  const { pid } = req.params;
+  const { title, price, color } = req.body;
+
+  const thumbnail = req?.files?.thumbnail[0]?.path;
+  const images = req.files?.images?.map((el) => el.path);
+
+  if (!(title && price && color)) throw new Error("Missing inputs");
+  const response = await Product.findByIdAndUpdate(
+    pid,
+    {
+      $push: {
+        varriants: {
+          color,
+          price,
+          title,
+          thumbnail,
+          images,
+          SKU: makeSKU().toUpperCase(),
+        },
+      },
+    },
+    { new: true }
+  );
+  return res.status(200).json({
+    success: response ? true : false,
+    message: response
+      ? "Add Varriants successly"
+      : "Something went wrongs... !!!",
+  });
+});
+
 module.exports = {
   createProduct,
   getProduct,
@@ -188,4 +258,5 @@ module.exports = {
   deleteProduct,
   ratings,
   uploadImagesProduct,
+  addVarriants,
 };

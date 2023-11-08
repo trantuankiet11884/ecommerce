@@ -66,3 +66,13 @@ export const generateRange = (s, e) => {
   const length = e + 1 - s;
   return Array.from({ length }, (_, idx) => s + idx);
 };
+
+export function getBase64(file) {
+  return new Promise((resovle, reject) => {
+    if (!file) return " ";
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resovle(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+}

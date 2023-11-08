@@ -256,36 +256,91 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 const getUsers = asyncHandler(async (req, res) => {
-  const response = await User.find().select("-refreshToken -password -role");
-  return res.status(200).json({
-    success: response ? true : false,
-    users: response,
+  const queries = { ...req.query };
+  const excludeFields = ["limit", "sort", "page", "fields"];
+  excludeFields.forEach((el) => delete queries[el]);
+
+  let queryString = JSON.stringify(queries);
+  queryString = queryString.replace(
+    /\b(gte|gt|lt|lte)\b/g,
+    (matchedEl) => `$${matchedEl}`
+  );
+  const formatedQueries = JSON.parse(queryString);
+
+  if (queries?.name)
+    formatedQueries.name = { $regex: queries.name, $options: "i" };
+
+  if (req.query.q) {
+    delete formatedQueries.q;
+    formatedQueries["$or"] = [
+      { firstName: { $regex: req.query.q, $options: "i" } },
+      { lastName: { $regex: req.query.q, $options: "i" } },
+      { email: { $regex: req.query.q, $options: "i" } },
+      { role: { $regex: req.query.q, $options: "i" } },
+    ];
+  }
+
+  let queryCommand = User.find(formatedQueries);
+
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    queryCommand = queryCommand.sort(sortBy);
+  }
+
+  if (req.query.fields) {
+    const fields = req.query.fields.split(",").join(" ");
+    queryCommand = queryCommand.select(fields);
+  }
+
+  const page = +req.query.page || 1;
+  const limit = +req.query.limit || process.env.LIMIT_PRODUCTS;
+  const skip = (page - 1) * limit;
+  queryCommand.skip(skip).limit(limit);
+
+  queryCommand.then((response) => {
+    return User.find(formatedQueries)
+      .countDocuments()
+      .then((counts) => {
+        return res.status(200).json({
+          success: response ? true : false,
+          counts,
+          users: response ? response : "Cannot get users !!!",
+        });
+      })
+      .catch((countsError) => {
+        throw new Error(countsError.message);
+      });
   });
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
-  const { _id } = req.query;
-  if (!_id) throw new Error("Missing");
-  const response = await User.findByIdAndDelete(_id);
+  const { uid } = req.params;
+  const response = await User.findByIdAndDelete(uid);
   return res.status(200).json({
     success: response ? true : false,
-    deletedUser: response
+    message: response
       ? `User with email : ${response.email} deleted `
       : "No user deleted",
   });
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  //
-  const { _id } = req.user;
-  if (!_id || Object.keys(req.body).length === 0)
+  const { id } = req.user;
+  const { firstName, lastName, email, mobile } = req.body;
+  const data = { firstName, lastName, email, mobile };
+
+  if (req.file) data.avatar = req.file.path;
+
+  if (!id || Object.keys(req.body).length === 0)
     throw new Error("Missing inputs");
-  const response = await User.findByIdAndUpdate(_id, req.body, {
+
+  const response = await User.findByIdAndUpdate(id, data, {
     new: true,
   }).select("-password -role -refreshToken");
+
   return res.status(200).json({
     success: response ? true : false,
-    updatedUser: response ? response : "Some thing went wrong",
+    message: response ? "Updated !!!" : "Some thing went wrong !!!",
   });
 });
 
@@ -295,10 +350,10 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
   if (Object.keys(req.body).length === 0) throw new Error("Missing inputs");
   const response = await User.findByIdAndUpdate(uid, req.body, {
     new: true,
-  }).select("-password -role -refreshToken");
+  }).select("-password -refreshToken");
   return res.status(200).json({
     success: response ? true : false,
-    updatedUser: response ? response : "Some thing went wrong",
+    message: response ? "Updated" : "Some thing went wrong",
   });
 });
 

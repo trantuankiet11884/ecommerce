@@ -11,6 +11,8 @@ import InputQuantity from "components/inputs/InputQuantity";
 import { productExtraInfomation } from "utils/constant";
 import { ProductExtraInfoItem, ProductInfomation } from "components";
 import { CustomeSlider } from "components";
+import DOMPurify from "dompurify";
+import clsx from "clsx";
 
 const settings = {
   dots: false,
@@ -21,11 +23,19 @@ const settings = {
 };
 
 const DetailsProduct = () => {
-  const { pid, title, category } = useParams();
+  const { pid, category } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [varriant, setVarriant] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState(null);
   const [currentImage, setCurrentImage] = useState(null);
+  const [currentProduct, setcurrentProduct] = useState({
+    title: "",
+    thumbnail: "",
+    images: [],
+    price: "",
+    color: "",
+  });
   const [update, setUpdate] = useState(false);
 
   const fetchProduct = async () => {
@@ -59,6 +69,19 @@ const DetailsProduct = () => {
     setUpdate(!update);
   }, [update]);
 
+  useEffect(() => {
+    if (varriant) {
+      setcurrentProduct({
+        title: product?.varriants?.find((el) => el.SKU === varriant)?.title,
+        color: product?.varriants?.find((el) => el.SKU === varriant)?.color,
+        price: product?.varriants?.find((el) => el.SKU === varriant)?.price,
+        images: product?.varriants?.find((el) => el.SKU === varriant)?.images,
+        thumbnail: product?.varriants?.find((el) => el.SKU === varriant)
+          ?.thumbnail,
+      });
+    }
+  }, [varriant, product?.varriants]);
+
   const handeQuantity = useCallback(
     (number) => {
       if (!Number(number) || Number(number) < 1) {
@@ -84,11 +107,15 @@ const DetailsProduct = () => {
     e.stopPropagation();
     setCurrentImage(item);
   };
+
   return (
     <div className="w-full">
       <div className="w-main">
-        <h3 className="font-bold">{title}</h3>
-        <Breadcrumb title={title} category={category} />
+        <h3 className="font-bold">{currentProduct?.title || product?.title}</h3>
+        <Breadcrumb
+          title={currentProduct?.title || product?.title}
+          category={category}
+        />
       </div>
       <div className="w-main mt-5 flex gap-2">
         <div className="flex-4 flex flex-col gap-4">
@@ -96,12 +123,12 @@ const DetailsProduct = () => {
             <ReactImageMagnify
               {...{
                 smallImage: {
-                  alt: "",
+                  alt: "product",
                   isFluidWidth: true,
-                  src: currentImage,
+                  src: currentProduct.thumbnail || currentImage,
                 },
                 largeImage: {
-                  src: currentImage,
+                  src: currentProduct.thumbnail || currentImage,
                   width: 1200,
                   height: 1000,
                 },
@@ -111,23 +138,35 @@ const DetailsProduct = () => {
 
           <div className="w-[450px] mx-2">
             <Slider {...settings} className="flex gap-2 justify-between">
-              {product?.images?.map((item) => (
-                <div className="px-2" key={item}>
-                  <img
-                    src={item}
-                    alt="sub-images"
-                    onClick={(e) => handleChangeImage(e, item)}
-                    className="h-[145px] w-[145px] border object-cover"
-                  />
-                </div>
-              ))}
+              {currentProduct.images.length === 0 &&
+                product?.images?.map((item) => (
+                  <div className="px-2" key={item}>
+                    <img
+                      src={item}
+                      alt="sub-images"
+                      onClick={(e) => handleChangeImage(e, item)}
+                      className="h-[145px] w-[145px] border object-cover"
+                    />
+                  </div>
+                ))}
+              {currentProduct.images.length > 0 &&
+                currentProduct.images?.map((item) => (
+                  <div className="px-2" key={item}>
+                    <img
+                      src={item}
+                      alt="sub-images"
+                      onClick={(e) => handleChangeImage(e, item)}
+                      className="h-[145px] w-[145px] border object-cover"
+                    />
+                  </div>
+                ))}
             </Slider>
           </div>
         </div>
         <div className="flex-4 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold">{`${formatMoney(
-              formatPrice(product?.price)
+              formatPrice(currentProduct.price || product?.price)
             )} VNĐ`}</h2>
             <span className="text-xs text-main">{`In Stock: ${product?.quantity} item`}</span>
           </div>
@@ -137,10 +176,61 @@ const DetailsProduct = () => {
             ))}
           </div>
           <ul className="list-square text-sm text-gray-500 pl-4">
-            {product?.description?.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
+            {product?.description?.length > 1 &&
+              product?.description?.map((item) => <li key={item}>{item}</li>)}
+            {product?.description?.length === 1 && (
+              <div
+                className="text-sm line-clamp-6"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(product?.description[0]),
+                }}
+              ></div>
+            )}
           </ul>
+
+          <div className="my-4 flex gap-4">
+            <span className="font-bold">Color: </span>
+            <div className="flex flex-wrap gap-4 items-center w-full">
+              <div
+                onClick={() => setVarriant(null)}
+                className={clsx(
+                  "flex items-center gap-2 p-2 border cursor-pointer",
+                  !varriant && "border-main"
+                )}
+              >
+                <img
+                  src={product?.thumbnail}
+                  alt="thumb"
+                  className="w-8 h-8 rounded-md object-contain"
+                />
+                <span className="flex flex-col">
+                  <span> {product?.color}</span>
+                  <span className="text-sm">{product?.price}</span>
+                </span>
+              </div>
+
+              {product?.varriants?.map((el) => (
+                <div
+                  onClick={() => setVarriant(el.SKU)}
+                  className={clsx(
+                    "flex items-center gap-2 p-2 border cursor-pointer",
+                    varriant === el.SKU && "border-main"
+                  )}
+                >
+                  <img
+                    src={el?.thumbnail}
+                    alt="thumb"
+                    className="w-8 h-8 rounded-md object-contain"
+                  />
+                  <span className="flex flex-col">
+                    <span> {el?.color}</span>
+                    <span className="text-sm">{el?.price}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <span className="font-semibold">Quantity</span>
@@ -170,7 +260,7 @@ const DetailsProduct = () => {
           ratings={product?.ratings}
           nameProduct={product?.title}
           pid={product?._id}
-          updateCS={updateCS} // Make sure you pass the correct function
+          updateCS={updateCS}
         />
       </div>
       <div className="my-8">

@@ -1,16 +1,17 @@
 import React from "react";
 
-import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
-import path from "utils/path";
+import { AdminSidebar } from "components";
+import { Outlet } from "react-router-dom";
 const AdminLayout = () => {
-  // const { isLoggedIn, current } = useSelector((state) => state.user);
-  // if (!isLoggedIn || !current || !+current.role !== 1)
-  //   return <Navigate to={`/${path.LOGIN}`} replace={true} />;
+  // bg-gray-100  relative text-gray-900
+  // top-0 bottom-0 fixed
   return (
-    <div>
-      <div>Layout</div>
-      <div>
+    <div className="flex bg-gray-100 min-h-screen">
+      <div className=" flex-none  ">
+        <AdminSidebar />
+        <div className="w-[250px]"></div>
+      </div>
+      <div className="flex-auto">
         <Outlet />
       </div>
     </div>

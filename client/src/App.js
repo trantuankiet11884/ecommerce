@@ -25,7 +25,13 @@ import {
   ManageProducts,
   ManageUsers,
 } from "pages/admin";
-import { MemberLayout, Personal } from "pages/member";
+import {
+  Cart,
+  HistoryOrder,
+  MemberLayout,
+  Personal,
+  WishList,
+} from "pages/member";
 function App() {
   const dispatch = useDispatch();
   const { isShowModal, modalChildren } = useSelector(
@@ -60,6 +66,9 @@ function App() {
 
         <Route path={path.MEMBER} element={<MemberLayout />}>
           <Route path={path.PERSONAL} element={<Personal />} />
+          <Route path={path.HISTORY_ORDER} element={<HistoryOrder />} />
+          <Route path={path.WISHLIST} element={<WishList />} />
+          <Route path={path.CART} element={<Cart id="cart" />} />
         </Route>
 
         <Route path={path.FINAL_REGISTER} element={<FinalRegister />}></Route>

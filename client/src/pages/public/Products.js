@@ -44,10 +44,7 @@ const Products = () => {
   );
 
   useEffect(() => {
-    let param = [];
-    for (let i of params.entries()) param.push(i);
-    const queries = {};
-    for (let i of params) queries[i[0]] = i[1];
+    const queries = Object.fromEntries([...params]);
     let priceQuery = {};
     if (queries.to && queries.from) {
       priceQuery = {
@@ -131,7 +128,7 @@ const Products = () => {
       <div className="w-main flex justify-center">
         <Pagination totalCount={products?.counts} />
       </div>
-      <div className="w-full h-[500px]"></div>
+      <div className="w-full h-[50px]"></div>
     </div>
   );
 };

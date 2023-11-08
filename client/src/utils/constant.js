@@ -182,3 +182,98 @@ export const voteOptions = [
     text: "Perfect",
   },
 ];
+
+const { AiOutlineDashboard, MdGroups, TbBrandProducthunt, RiBillLine } = icons;
+
+export const adminNavLink = [
+  {
+    id: 1,
+    type: "SINGLE",
+    text: "Dashboard",
+    path: `/${path.ADMIN}/${path.DASHBOARD}`,
+    icon: <AiOutlineDashboard />,
+  },
+  {
+    id: 2,
+    type: "SINGLE",
+    text: "Users",
+    path: `/${path.ADMIN}/${path.MANAGE_USERS}`,
+    icon: <MdGroups />,
+  },
+  {
+    id: 3,
+    type: "SINGLE",
+    text: "Orders",
+    path: `/${path.ADMIN}/${path.MANAGE_ORDER}`,
+    icon: <RiBillLine />,
+  },
+  {
+    id: 4,
+    type: "PARENT",
+    text: "Products",
+    icon: <TbBrandProducthunt />,
+    subMenu: [
+      {
+        text: "Manage Products",
+        path: `/${path.ADMIN}/${path.MANAGE_PRODUCTS}`,
+      },
+      {
+        text: "Create Product",
+        path: `/${path.ADMIN}/${path.CREATE_PRODUCTS}`,
+      },
+    ],
+  },
+];
+
+export const memberNavLink = [
+  {
+    id: 1,
+    type: "SINGLE",
+    text: "Personal",
+    path: `/${path.MEMBER}/${path.PERSONAL}`,
+    icon: <AiOutlineDashboard />,
+  },
+  {
+    id: 2,
+    type: "SINGLE",
+    text: "My Cart",
+    path: `/${path.MEMBER}/${path.CART}`,
+    icon: <MdGroups />,
+  },
+  {
+    id: 3,
+    type: "SINGLE",
+    text: "WishList",
+    path: `/${path.MEMBER}/${path.WISHLIST}`,
+    icon: <RiBillLine />,
+  },
+  {
+    id: 4,
+    type: "SINGLE",
+    text: "Orders",
+    path: `/${path.MEMBER}/${path.HISTORY_ORDER}`,
+    icon: <RiBillLine />,
+  },
+];
+
+export const roles = [
+  {
+    code: 0,
+    value: "User",
+  },
+  {
+    code: 1,
+    value: "Admin",
+  },
+];
+
+export const blocked = [
+  {
+    code: true,
+    value: "BLOCKED",
+  },
+  {
+    code: false,
+    value: "ACTIVE",
+  },
+];
