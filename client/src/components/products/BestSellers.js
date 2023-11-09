@@ -3,6 +3,7 @@ import { apiGetProducts } from "apis/product";
 import { getNewProducts } from "store/products/asyncAction";
 import { useDispatch, useSelector } from "react-redux";
 import { CustomeSlider } from "components";
+import clsx from "clsx";
 
 const tabs = [
   { id: 0, name: "best sellers", sort: "-sold" },
@@ -13,7 +14,8 @@ const BestSellers = () => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState(0);
   const [products, setProducts] = useState([]);
-  const { newProducts } = useSelector((state) => state.products);
+  const { isShowModal } = useSelector((state) => state.appReducer);
+
   useEffect(() => {
     const fetchData = async () => {
       const response = await apiGetProducts({ sort: tabs[activeTab].sort });
@@ -26,12 +28,12 @@ const BestSellers = () => {
   }, [activeTab]);
 
   return (
-    <div>
+    <div className={clsx(isShowModal ? "hidden" : "block")}>
       <div className="flex text-lg gap-8 pb-4 border-b-2 border-main">
         {tabs.map((item) => (
           <span
             className={`cursor-pointer font-semibold text-gray-400 uppercase ${
-              activeTab === item.id ? "text-black" : ""
+              activeTab === item.id ? "text-black" : "text-black"
             }`}
             onClick={() => setActiveTab(item.id)}
             key={item.id}

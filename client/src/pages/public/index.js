@@ -8,3 +8,4 @@ export { default as DetailsProduct } from "./DetailsProduct.js";
 export { default as Products } from "./Products.js";
 export { default as FinalRegister } from "./FinalRegister.js";
 export { default as ResetPassword } from "./ResetPassword.js";
+export { default as DetailsCart } from "./DetailsCart.js";

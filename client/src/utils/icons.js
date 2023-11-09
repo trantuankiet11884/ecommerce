@@ -6,6 +6,8 @@ import {
   BsShieldShaded,
   BsReply,
   BsFillTrashFill,
+  BsCartPlus,
+  BsFillCartCheckFill,
 } from "react-icons/bs";
 import { FaUserCircle, FaTty } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
@@ -25,8 +27,10 @@ import {
 import { TbBrandProducthunt } from "react-icons/tb";
 const icons = {
   RiPhoneFill,
+  BsCartPlus,
   AiOutlineDown,
   BsFillTrashFill,
+  BsFillCartCheckFill,
   AiFillEdit,
   TbBrandProducthunt,
   AiOutlineStepBackward,

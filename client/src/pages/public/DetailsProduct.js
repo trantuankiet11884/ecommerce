@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { apiGetProduct, apiGetProducts } from "apis";
+import { createSearchParams, useParams } from "react-router-dom";
+import { apiGetProduct, apiGetProducts, apiUpdateCart } from "apis";
 import { Breadcrumb } from "components";
 import ReactImageMagnify from "react-image-magnify";
 
@@ -13,6 +13,12 @@ import { ProductExtraInfoItem, ProductInfomation } from "components";
 import { CustomeSlider } from "components";
 import DOMPurify from "dompurify";
 import clsx from "clsx";
+import { useSelector } from "react-redux";
+import { getCurrent } from "store/user/asyncActions";
+import path from "utils/path";
+import { withNavigate } from "hocs";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const settings = {
   dots: false,
@@ -22,13 +28,22 @@ const settings = {
   slidesToScroll: 1,
 };
 
-const DetailsProduct = () => {
-  const { pid, category } = useParams();
+const DetailsProduct = ({
+  isQuickView,
+  data,
+  location,
+  dispatch,
+  navigate,
+}) => {
+  const params = useParams();
+  const { current } = useSelector((state) => state.user);
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [varriant, setVarriant] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState(null);
   const [currentImage, setCurrentImage] = useState(null);
+  const [pid, setPid] = useState(null);
+  const [category, setCategory] = useState(null);
   const [currentProduct, setcurrentProduct] = useState({
     title: "",
     thumbnail: "",
@@ -50,6 +65,16 @@ const DetailsProduct = () => {
     const response = await apiGetProducts({ category });
     if (response.success) setRelatedProducts(response.products);
   };
+
+  useEffect(() => {
+    if (data) {
+      setPid(data.pid);
+      setCategory(data.catagory);
+    } else if (params) {
+      setPid(params.pid);
+      setCategory(params.category);
+    }
+  }, [data, params]);
 
   useEffect(() => {
     if (pid) {
@@ -103,22 +128,65 @@ const DetailsProduct = () => {
     },
     [quantity]
   );
+
   const handleChangeImage = (e, item) => {
     e.stopPropagation();
     setCurrentImage(item);
   };
 
+  const handleAddToCart = async () => {
+    if (!current)
+      return Swal.fire({
+        title: "Almost...",
+        text: "Login, plsssss!!!",
+        icon: "info",
+        showConfirmButton: "true",
+        showCancelButton: "Not Now !!!",
+        confirmButtonText: "Go Login !!!",
+      }).then((rs) => {
+        if (rs.isConfirmed)
+          navigate({
+            pathname: path.LOGIN,
+            search: createSearchParams({
+              redirect: location.pathname,
+            }).toString(),
+          });
+      });
+    const response = await apiUpdateCart({
+      pid: pid,
+      color: currentProduct.color,
+      quantity,
+    });
+    if (response.success) {
+      toast.success(response.message);
+      dispatch(getCurrent());
+    } else toast.error(response.message);
+  };
+
   return (
-    <div className="w-full">
-      <div className="w-main">
-        <h3 className="font-bold">{currentProduct?.title || product?.title}</h3>
-        <Breadcrumb
-          title={currentProduct?.title || product?.title}
-          category={category}
-        />
-      </div>
-      <div className="w-main mt-5 flex gap-2">
-        <div className="flex-4 flex flex-col gap-4">
+    <div onClick={(e) => e.stopPropagation()} className="w-full">
+      {!isQuickView && (
+        <div className="w-main">
+          <h3 className="font-bold">
+            {currentProduct?.title || product?.title}
+          </h3>
+          <Breadcrumb
+            title={currentProduct?.title || product?.title}
+            category={category}
+          />
+        </div>
+      )}
+      <div
+        className={clsx(
+          " bg-white rounded-md mt-5 flex gap-2",
+          isQuickView
+            ? "max-w-[900px] mx-auto max-h-80vh overflow-y-auto"
+            : "w-main"
+        )}
+      >
+        <div
+          className={clsx("flex-4 flex flex-col gap-4", isQuickView && "w-1/2")}
+        >
           <div className="w-[450px] h-[450px] border overflow-hidden">
             <ReactImageMagnify
               {...{
@@ -136,7 +204,7 @@ const DetailsProduct = () => {
             />
           </div>
 
-          <div className="w-[450px] mx-2">
+          <div className={clsx("w-[450px] mx-2")}>
             <Slider {...settings} className="flex gap-2 justify-between">
               {currentProduct.images.length === 0 &&
                 product?.images?.map((item) => (
@@ -240,37 +308,43 @@ const DetailsProduct = () => {
                 handlePlusMinus={handlePlusMinus}
               />
             </div>
-            <Button>Add to Cart</Button>
+            <Button onOk={handleAddToCart}>Add to Cart</Button>
           </div>
         </div>
-        <div className="flex-2">
-          {productExtraInfomation.map((item) => (
-            <ProductExtraInfoItem
-              key={item.id}
-              title={item.title}
-              sub={item.sub}
-              icon={item.icon}
+        {!isQuickView && (
+          <div className="flex-2">
+            {productExtraInfomation.map((item) => (
+              <ProductExtraInfoItem
+                key={item.id}
+                title={item.title}
+                sub={item.sub}
+                icon={item.icon}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      {!isQuickView && (
+        <>
+          <div className="mt-8">
+            <ProductInfomation
+              totalRatings={product?.totalRatings}
+              ratings={product?.ratings}
+              nameProduct={product?.title}
+              pid={product?._id}
+              updateCS={updateCS}
             />
-          ))}
-        </div>
-      </div>
-      <div className="mt-8">
-        <ProductInfomation
-          totalRatings={product?.totalRatings}
-          ratings={product?.ratings}
-          nameProduct={product?.title}
-          pid={product?._id}
-          updateCS={updateCS}
-        />
-      </div>
-      <div className="my-8">
-        <h3 className="text-lg font-semibold py-4 border-b-2 border-main uppercase w-full">
-          ORTHER CUSTOMER ALSO LIKED
-        </h3>
-        <CustomeSlider products={relatedProducts} normal={true} />
-      </div>
+          </div>
+          <div className="my-8">
+            <h3 className="text-lg font-semibold py-4 border-b-2 border-main uppercase w-full">
+              ORTHER CUSTOMER ALSO LIKED
+            </h3>
+            <CustomeSlider products={relatedProducts} normal={true} />
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
-export default DetailsProduct;
+export default withNavigate(DetailsProduct);

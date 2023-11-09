@@ -153,14 +153,14 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 const ratings = asyncHandler(async (req, res) => {
-  const { _id } = req.user;
+  const { id } = req.user;
   const { star, comment, pid, updatedAt } = req.body;
 
   if (!star || !pid) throw new Error("Missing input !!!");
 
   const ratingProduct = await Product.findById(pid);
   const alreadyRating = ratingProduct?.ratings?.find(
-    (el) => el.postedBy === _id
+    (el) => el.postedBy === id
   );
 
   if (alreadyRating) {
@@ -181,7 +181,7 @@ const ratings = asyncHandler(async (req, res) => {
     await Product.findByIdAndUpdate(
       pid,
       {
-        $push: { ratings: { star, comment, postedBy: _id, updatedAt } },
+        $push: { ratings: { star, comment, postedBy: id, updatedAt } },
       },
       { new: true }
     );

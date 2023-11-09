@@ -13,7 +13,7 @@ const InputQuantity = ({ quantity, handeQuantity, handlePlusMinus }) => {
         min={1}
         value={quantity}
         onChange={(e) => handeQuantity(e.target.value)}
-        className="py-2 outline-none w-12"
+        className="py-2 outline-none w-12 border-none text-center bg-gray-100"
       />
       <span
         className="text-lg cursor-pointer p-2 border-l border-black"

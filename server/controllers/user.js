@@ -118,43 +118,51 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const getCurrent = asyncHandler(async (req, res) => {
-  // const { _id } = req.user;
-  // const user = await User.findById(_id).select("-refreshToken -password");
-
-  // return res.status(200).json({
-  //   success: user ? true : false,
-  //   rs: user ? user : "User not found",
-  // });
-
-  if (!req.user || !req.user.id) {
-    return res.status(400).json({
-      success: false,
-      message: "User ID (id) not provided",
+  const { id } = req.user;
+  const user = await User.findById(id)
+    .select("-refreshToken -password")
+    .populate({
+      path: "cart",
+      populate: { path: "product", select: "id title thumbnail price" },
     });
-  }
 
-  try {
-    const user = await User.findById(req.user.id).select(
-      "-refreshToken -password"
-    );
+  return res.status(200).json({
+    success: user ? true : false,
+    rs: user ? user : "User not found",
+  });
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+  // if (!req.user || !req.user.id) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: "User ID (id) not provided",
+  //   });
+  // }
 
-    return res.status(200).json({
-      success: user ? true : false,
-      rs: user,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
-  }
+  // try {
+  //   const user = await User.findById(req.user.id)
+  //     .select("-refreshToken -password")
+  //     .populate({
+  //       path: "cart",
+  //       populate: { path: "product", select: "title thumbnail price " },
+  //     });
+
+  //   if (!user) {
+  //     return res.status(404).json({
+  //       success: false,
+  //       message: "User not found",
+  //     });
+  //   }
+
+  //   return res.status(200).json({
+  //     success: user ? true : false,
+  //     rs: user,
+  //   });
+  // } catch (error) {
+  //   return res.status(500).json({
+  //     success: false,
+  //     message: "Internal server error",
+  //   });
+  // }
 });
 
 const refreshAT = asyncHandler(async (req, res) => {
@@ -391,34 +399,22 @@ const updateUserAddress = asyncHandler(async (req, res) => {
 const updateCart = asyncHandler(async (req, res) => {
   //
   const { id } = req.user;
-  const { pid, quantity, color } = req.body;
-  if (!pid || !quantity || !color) throw new Error("Missing inputs");
+  const { pid, quantity = 1, color } = req.body;
+  if (!pid || !color) throw new Error("Missing inputs");
   const user = await User.findById(id).select("cart");
   const alreadyProduct = user?.cart?.find(
     (el) => el.product.toString() === pid
   );
   if (alreadyProduct) {
-    if (alreadyProduct.color === color) {
-      const response = await User.updateOne(
-        { cart: { $elemMatch: alreadyProduct } },
-        { $set: { "cart.$.quantity": quantity } },
-        { new: true }
-      );
-      return res.status(200).json({
-        success: response ? true : false,
-        updatedUser: response ? response : "Some thing went wrong",
-      });
-    } else {
-      const response = await User.findByIdAndUpdate(
-        id,
-        { $push: { cart: { product: pid, quantity, color } } },
-        { new: true }
-      );
-      return res.status(200).json({
-        success: response ? true : false,
-        updatedUser: response ? response : "Some thing went wrong",
-      });
-    }
+    const response = await User.updateOne(
+      { cart: { $elemMatch: alreadyProduct } },
+      { $set: { "cart.$.quantity": quantity, "cart.$.color": color } },
+      { new: true }
+    );
+    return res.status(200).json({
+      success: response ? true : false,
+      message: response ? "Updated your cart" : "Some thing went wrong",
+    });
   } else {
     const response = await User.findByIdAndUpdate(
       id,
@@ -427,9 +423,34 @@ const updateCart = asyncHandler(async (req, res) => {
     );
     return res.status(200).json({
       success: response ? true : false,
-      updatedUser: response ? response : "Some thing went wrong",
+      message: response ? "Updated your cart" : "Some thing went wrong",
     });
   }
+});
+
+const removeCart = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { pid } = req.params;
+  const user = await User.findById(id).select("cart");
+  const alreadyProduct = user?.cart?.find(
+    (el) => el.product.toString() === pid
+  );
+  if (!alreadyProduct) {
+    return res.status(200).json({
+      success: true,
+      message: "Updated your cart",
+    });
+  }
+
+  const response = await User.findByIdAndUpdate(
+    id,
+    { $pull: { cart: { product: pid } } },
+    { new: true }
+  );
+  return res.status(200).json({
+    success: response ? true : false,
+    message: response ? "Updated your cart" : "Some thing went wrong",
+  });
 });
 
 module.exports = {
@@ -447,4 +468,5 @@ module.exports = {
   updateUserByAdmin,
   updateUserAddress,
   updateCart,
+  removeCart,
 };

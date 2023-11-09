@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { logo } from "assets/js/index.js";
 import icons from "utils/icons.js";
 import { Link } from "react-router-dom";
 import path from "utils/path.js";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "store/user/userSlice";
+import { withNavigate } from "hocs";
+import { showCart } from "store/app/appSlice";
 
 const { RiPhoneFill, MdEmail, BsHandbagFill, FaUserCircle } = icons;
-const Header = () => {
+const Header = ({ dispatch }) => {
   const { current } = useSelector((state) => state.user);
   const [isShowOption, setisShowOption] = useState(false);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const handleClickWeb = (e) => {
@@ -46,9 +47,14 @@ const Header = () => {
         </div>
         {current && (
           <>
-            <div className="flex px-4 items-center justify-center gap-2 border-r">
+            <div
+              onClick={() => dispatch(showCart({ singal: true }))}
+              className="flex px-4 items-center justify-center gap-2 border-r"
+            >
               <BsHandbagFill color="red" />
-              <span className="text-[12px]">0 item</span>
+              <span className="text-[12px]">{`${
+                current?.cart?.length || 0
+              } item `}</span>
             </div>
             <div
               className="cursor-pointer flex px-4 items-center justify-center gap-1 relative"
@@ -92,4 +98,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default withNavigate(memo(Header));

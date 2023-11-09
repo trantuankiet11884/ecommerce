@@ -11,12 +11,13 @@ import {
   Products,
   FinalRegister,
   ResetPassword,
+  DetailsCart,
 } from "./pages/public";
 import path from "./utils/path.js";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
-import { Modal } from "./components";
+import { Cart, Modal } from "./components";
 import {
   AdminLayout,
   CreateProducts,
@@ -25,20 +26,23 @@ import {
   ManageProducts,
   ManageUsers,
 } from "pages/admin";
-import {
-  Cart,
-  HistoryOrder,
-  MemberLayout,
-  Personal,
-  WishList,
-} from "pages/member";
+import { HistoryOrder, MemberLayout, Personal, WishList } from "pages/member";
+import { showCart } from "store/app/appSlice";
 function App() {
   const dispatch = useDispatch();
-  const { isShowModal, modalChildren } = useSelector(
+  const { isShowModal, modalChildren, isShowCart } = useSelector(
     (state) => state.appReducer
   );
   return (
-    <div className="font-main relative">
+    <div className="font-main h-screen relative ">
+      {isShowCart && (
+        <div
+          onClick={() => dispatch(showCart())}
+          className="absolute inset-0 bg-overlay z-50 flex justify-end"
+        >
+          <Cart />
+        </div>
+      )}
       {isShowModal && <Modal>{modalChildren}</Modal>}
       <Routes>
         <Route path={path.PUBLIC} element={<Public />}>
@@ -53,7 +57,7 @@ function App() {
             path={path.DETAILS_PRODUCT_CATEGORY_PID_TITLE}
             element={<DetailsProduct />}
           ></Route>
-          <Route path={path.ALL} element={<Home />}></Route>
+          <Route path={path.DETAIL_CART} element={<DetailsCart />}></Route>
         </Route>
 
         <Route path={path.ADMIN} element={<AdminLayout />}>

@@ -3,26 +3,63 @@ import { formatMoney, renderStar } from "utils/fn";
 import { news, trending } from "assets/js";
 import { SelectOption } from "components";
 import icons from "utils/icons";
-import { Link } from "react-router-dom";
 import { withNavigate } from "hocs";
+import { showModal } from "store/app/appSlice";
+import { DetailsProduct } from "pages/public";
+import { apiUpdateCart } from "apis";
+import { toast } from "react-toastify";
+import { getCurrent } from "store/user/asyncActions";
+import { useSelector } from "react-redux";
+import Swal from "sweetalert2";
 import path from "utils/path";
-const { AiFillEye, AiOutlineMenu, BsFillSuitHeartFill } = icons;
+const { AiFillEye, BsFillSuitHeartFill, BsCartPlus, BsFillCartCheckFill } =
+  icons;
 
-const Product = ({ productsData, isNew, pid, normal, navigate }) => {
+const Product = ({ productsData, isNew, normal, navigate, dispatch }) => {
+  const { current } = useSelector((state) => state.user);
   const [isShowOption, setIsShowOption] = useState(false);
 
-  const handleClickOptions = (e, option) => {
+  const handleClickOptions = async (e, option) => {
     e.stopPropagation();
 
-    if (option === "menu")
-      navigate(
-        `/${productsData?.category.toLowerCase()}/${productsData?._id}/${
-          productsData?.title
-        }`
-      );
-
+    if (option === "cart") {
+      if (!current)
+        return Swal.fire({
+          title: "Almost...",
+          text: "Login, plsssss!!!",
+          icon: "info",
+          showConfirmButton: "true",
+          showCancelButton: "Not Now !!!",
+          confirmButtonText: "Go Login !!!",
+        }).then((rs) => {
+          if (rs.isConfirmed) navigate(`/${path.LOGIN}`);
+        });
+      const response = await apiUpdateCart({
+        pid: productsData?._id,
+        color: productsData?.color,
+      });
+      if (response.success) {
+        toast.success(response.message);
+        dispatch(getCurrent());
+      } else toast.error(response.message);
+    }
     if (option === "wishlist") console.log("wishlist");
-    if (option === "view") console.log("view");
+    if (option === "view") {
+      dispatch(
+        showModal({
+          isShowModal: true,
+          modalChildren: (
+            <DetailsProduct
+              isQuickView={true}
+              data={{
+                pid: productsData?._id,
+                category: productsData?.category,
+              }}
+            />
+          ),
+        })
+      );
+    }
   };
 
   return (
@@ -48,13 +85,28 @@ const Product = ({ productsData, isNew, pid, normal, navigate }) => {
         <div className="w-full relative">
           {isShowOption && (
             <div className="absolute flex  bottom-[-10px] left-0 right-0 items-center justify-center g-4 animate-slide-top">
-              <span onClick={(e) => handleClickOptions(e, "view")}>
+              <span
+                title="Quick View"
+                onClick={(e) => handleClickOptions(e, "view")}
+              >
                 <SelectOption icon={<AiFillEye />} />
               </span>
-              <span onClick={(e) => handleClickOptions(e, "menu")}>
-                <SelectOption icon={<AiOutlineMenu />} />
-              </span>
-              <span onClick={(e) => handleClickOptions(e, "wishlist")}>
+              {current?.cart?.some((el) => el.product === productsData?._id) ? (
+                <span title="Add to Cart">
+                  <SelectOption icon={<BsFillCartCheckFill />} />
+                </span>
+              ) : (
+                <span
+                  title="Add to Cart"
+                  onClick={(e) => handleClickOptions(e, "cart")}
+                >
+                  <SelectOption icon={<BsCartPlus />} />
+                </span>
+              )}
+              <span
+                title="Add to Wishlist"
+                onClick={(e) => handleClickOptions(e, "wishlist")}
+              >
                 <SelectOption icon={<BsFillSuitHeartFill />} />
               </span>
             </div>

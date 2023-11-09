@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, InputField, Loading } from "components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   apiFinalRegister,
   apiForgotPassword,
@@ -17,6 +17,7 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [showModal, setShowModal] = useState(false);
 
@@ -74,7 +75,9 @@ const Login = () => {
                 userData: response.userData,
               })
             );
-            navigate(`/${path.HOME}`);
+            searchParams.get("redirect")
+              ? navigate(searchParams.get("redirect"))
+              : navigate(`/${path.HOME}`);
           } else {
             Swal.fire("Oops !!!", response.message, "error");
           }

@@ -15,6 +15,7 @@ import {
 import { apiGetProducts } from "apis";
 import Masonry from "react-masonry-css";
 import { sortBy } from "utils/constant";
+
 const breakpointColumnsObj = {
   default: 4,
   1100: 3,
@@ -31,7 +32,7 @@ const Products = () => {
   const [params] = useSearchParams();
 
   const fetchProductsByCategory = async (queries) => {
-    const response = await apiGetProducts(queries);
+    const response = await apiGetProducts({ ...queries, category });
     if (response.success) setProducts(response);
   };
 

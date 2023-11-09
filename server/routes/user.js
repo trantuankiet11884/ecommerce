@@ -16,6 +16,7 @@ router.delete("/:uid", [verifyAT, isAdmin], ctrls.deleteUser);
 router.put("/current", [verifyAT], uploader.single("avatar"), ctrls.updateUser);
 router.put("/address", [verifyAT], ctrls.updateUserAddress);
 router.put("/cart", [verifyAT], ctrls.updateCart);
+router.delete("/remove-cart/:pid", [verifyAT], ctrls.removeCart);
 router.put("/:uid", [verifyAT, isAdmin], ctrls.updateUserByAdmin);
 
 module.exports = router;
