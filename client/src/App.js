@@ -26,7 +26,13 @@ import {
   ManageProducts,
   ManageUsers,
 } from "pages/admin";
-import { HistoryOrder, MemberLayout, Personal, WishList } from "pages/member";
+import {
+  Checkout,
+  HistoryOrder,
+  MemberLayout,
+  Personal,
+  WishList,
+} from "pages/member";
 import { showCart } from "store/app/appSlice";
 function App() {
   const dispatch = useDispatch();
@@ -45,6 +51,7 @@ function App() {
       )}
       {isShowModal && <Modal>{modalChildren}</Modal>}
       <Routes>
+        <Route path={path.CHECKOUT} element={<Checkout />}></Route>
         <Route path={path.PUBLIC} element={<Public />}>
           <Route path={path.HOME} element={<Home />}></Route>
           <Route path={path.LOGIN} element={<Login />}></Route>
@@ -57,7 +64,7 @@ function App() {
             path={path.DETAILS_PRODUCT_CATEGORY_PID_TITLE}
             element={<DetailsProduct />}
           ></Route>
-          <Route path={path.DETAIL_CART} element={<DetailsCart />}></Route>
+          {/* <Route path={path.DETAIL_CART} element={<DetailsCart />}></Route> */}
         </Route>
 
         <Route path={path.ADMIN} element={<AdminLayout />}>
@@ -72,7 +79,7 @@ function App() {
           <Route path={path.PERSONAL} element={<Personal />} />
           <Route path={path.HISTORY_ORDER} element={<HistoryOrder />} />
           <Route path={path.WISHLIST} element={<WishList />} />
-          <Route path={path.CART} element={<Cart id="cart" />} />
+          <Route path={path.CART} element={<DetailsCart />} />
         </Route>
 
         <Route path={path.FINAL_REGISTER} element={<FinalRegister />}></Route>

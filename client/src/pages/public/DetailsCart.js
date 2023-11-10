@@ -1,31 +1,20 @@
-import { Breadcrumb, Button, InputQuantity } from "components";
+import React from "react";
+import { Breadcrumb, Button, OrderItem } from "components";
 import { withNavigate } from "hocs";
-import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { formatMoney } from "utils/fn";
+import path from "utils/path";
+import { Link } from "react-router-dom";
 
 const DetailsCart = ({ location }) => {
-  const { current } = useSelector((state) => state.user);
-  const [quantity, setQuantity] = useState(0);
-  const handeQuantity = (number) => {
-    if (+number > 1) setQuantity(number);
-  };
-
-  const handlePlusMinus = (flag) => {
-    if (flag === "minus" && quantity === 1) return;
-    if (flag === "minus") {
-      setQuantity((prev) => +prev - 1);
-    }
-    if (flag === "plus") {
-      setQuantity((prev) => +prev + 1);
-    }
-  };
-
+  const { currentCart } = useSelector((state) => state.user);
   return (
     <div className="w-main">
       <div>
         <h3 className="font-bold uppercase text-lg"> My Cart</h3>
-        <Breadcrumb category={location?.pathname} />
+        {/* <Breadcrumb
+          category={location?.pathname?.replace("/", "")?.split("-")?.join(" ")}
+        /> */}
       </div>
       <div className="flex flex-col border rounded-md w-main mx-auto my-4 text-center">
         <div className="w-main mx-auto bg-main text-white font-bold py-3 grid grid-cols-10">
@@ -33,39 +22,17 @@ const DetailsCart = ({ location }) => {
           <span className="col-span-1 w-full">Quantity</span>
           <span className="col-span-3 w-full">Price</span>
         </div>
-        {current?.cart?.map((item) => (
-          <div
+        {currentCart.map((item) => (
+          <OrderItem
+            item={item}
             key={item._id}
-            className="w-main mx-auto border-b font-bold grid grid-cols-10 py-3 text-center"
-          >
-            <span className="col-span-6 w-full">
-              <div className="flex gap-2 ">
-                <img
-                  src={item?.product?.thumbnail}
-                  alt="thumbnail"
-                  className="w-28 h-28 object-cover"
-                />
-                <div className="flex flex-col gap-1 items-start">
-                  <span className="font-bold text-sm">
-                    {item?.product?.title}
-                  </span>
-                  <span className="text-xs">{item.color}</span>
-                </div>
-              </div>
-            </span>
-            <span className="col-span-1 w-full">
-              <div className="flex items-center h-full">
-                <InputQuantity
-                  quantity={quantity}
-                  handeQuantity={handeQuantity}
-                  handlePlusMinus={handlePlusMinus}
-                />
-              </div>
-            </span>
-            <span className="col-span-3 w-full text-lg h-full flex items-center justify-center">
-              {formatMoney(item?.product?.price) + " VNĐ"}
-            </span>
-          </div>
+            color={item?.color}
+            defaultQuantity={item?.quantity}
+            title={item?.title}
+            thumbnail={item?.thumbnail}
+            price={item?.price}
+            pid={item?.product?._id}
+          />
         ))}
       </div>
       <div className="w-main mx-auto flex items-end justify-end my-4 gap-3">
@@ -74,15 +41,21 @@ const DetailsCart = ({ location }) => {
             <span>Subtoal: </span>
             <span className="text-black font-bold">
               {formatMoney(
-                current?.cart?.reduce(
-                  (acc, item) => acc + Number(item.product?.price),
+                currentCart.reduce(
+                  (acc, item) => +acc + Number(item?.price) * item.quantity,
                   0
                 )
               ) + " VNĐ"}
             </span>
           </p>
           <div className="text-end my-3">
-            <Button>Checkout</Button>
+            <Link
+              to={`/${path.CHECKOUT}`}
+              target="_blank"
+              className="px-4 py-2 border bg-main text-white rounded-lg"
+            >
+              Checkout
+            </Link>
           </div>
         </div>
       </div>

@@ -10,15 +10,15 @@ import { apiRemoveCart } from "apis";
 import { toast } from "react-toastify";
 import { getCurrent } from "store/user/asyncActions";
 import path from "utils/path";
-const Cart = ({ dispatch, navigate }) => {
-  const { current } = useSelector((state) => state.user);
 
-  const removeCart = async (pid) => {
-    const response = await apiRemoveCart(pid);
+const Cart = ({ dispatch, navigate }) => {
+  const { currentCart } = useSelector((state) => state.user);
+
+  const removeCart = async (pid, color) => {
+    const response = await apiRemoveCart(pid, color);
     if (response.success) dispatch(getCurrent());
     else toast.error(response.message);
   };
-
   return (
     <div
       onClick={(e) => e.stopPropagation()}
@@ -34,32 +34,31 @@ const Cart = ({ dispatch, navigate }) => {
         </span>
       </header>
       <section className="row-span-7 gap-2 h-full py-3 max-h-full overflow-y-auto">
-        {!current?.cart ? (
+        {!currentCart ? (
           <span className="text-xs text-main">Yourt Cart Is Empty</span>
         ) : (
           <div>
-            {current?.cart?.map((item) => (
+            {currentCart?.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="flex justify-between items-center gap-2"
               >
                 <img
-                  src={item?.product?.thumbnail}
+                  src={item?.thumbnail}
                   alt="thumbnail"
                   className="w-16 h-16 object-cover"
                 />
                 <div className="flex flex-col gap-2 border-b w-full">
-                  <span className="font-bold text-sm">
-                    {item?.product?.title}
-                  </span>
-                  <span className="text-xs">{item.color}</span>
+                  <span className="font-bold text-sm">{item?.title}</span>
+                  <span className="text-xs">{item?.color}</span>
+                  <span className="text-xs font-bold">{`Quantity: ${item?.quantity}`}</span>
                   <span className="text-sm text-end">
-                    {formatMoney(item?.product?.price) + " VNĐ"}
+                    {formatMoney(item?.price) + " VNĐ"}
                   </span>
                 </div>
                 <span
                   className="h-8 w-8 rounded-full cursor-pointer flex items-center justify-center hover:text-main"
-                  onClick={() => removeCart(item.product?._id)}
+                  onClick={() => removeCart(item.product?._id, item?.color)}
                 >
                   <ImBin size={18} />
                 </span>
@@ -73,8 +72,8 @@ const Cart = ({ dispatch, navigate }) => {
           <span>Subtotal: </span>
           <span className="font-bold">
             {formatMoney(
-              current?.cart?.reduce(
-                (acc, item) => acc + Number(item.product?.price),
+              currentCart?.reduce(
+                (acc, item) => acc + Number(item?.price) * item.quantity,
                 0
               )
             ) + " VNĐ"}
@@ -84,7 +83,7 @@ const Cart = ({ dispatch, navigate }) => {
           style="w-full bg-main rounded-md p-2"
           onOk={() => {
             dispatch(showCart());
-            navigate(`/${path.DETAIL_CART}`);
+            navigate(`/${path.MEMBER}/${path.CART}`);
           }}
         >
           Shopping Cart

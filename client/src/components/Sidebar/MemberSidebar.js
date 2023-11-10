@@ -20,7 +20,7 @@ const MemberSidebar = () => {
     }
   };
   return (
-    <div className=" bg-white h-full py-4 font-semibold w-[250px] flex-none">
+    <div className=" bg-white h-full py-4 font-semibold w-[200px] flex-none">
       <div className="w-full flex flex-col gap-1 items-center justify-center py-4">
         <img
           src={current?.avatar || avatarJoke}
@@ -84,6 +84,9 @@ const MemberSidebar = () => {
             )}
           </Fragment>
         ))}
+        <NavLink to={`/`} className={clsx(notActiveStlye)}>
+          <span>Go Home !!!</span>
+        </NavLink>
       </div>
     </div>
   );

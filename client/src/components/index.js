@@ -8,6 +8,7 @@ export { default as Product } from "./products/Product.js";
 export { default as DealDaily } from "./products/DealDaily.js";
 export { default as CountDown } from "./common/CountDown.js";
 export { default as FeatureProducts } from "./products/FeatureProducts.js";
+export { default as OrderItem } from "./products/OrderItem.js";
 export { default as ProductCard } from "./products/ProductCard.js";
 export { default as CustomizeVarriants } from "./products/CustomizeVarriants.js";
 export { default as Cart } from "./products/Cart.js";

@@ -12,10 +12,18 @@ import { getCurrent } from "store/user/asyncActions";
 import { useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import path from "utils/path";
+import { createSearchParams } from "react-router-dom";
 const { AiFillEye, BsFillSuitHeartFill, BsCartPlus, BsFillCartCheckFill } =
   icons;
 
-const Product = ({ productsData, isNew, normal, navigate, dispatch }) => {
+const Product = ({
+  productsData,
+  isNew,
+  normal,
+  navigate,
+  dispatch,
+  location,
+}) => {
   const { current } = useSelector((state) => state.user);
   const [isShowOption, setIsShowOption] = useState(false);
 
@@ -32,11 +40,21 @@ const Product = ({ productsData, isNew, normal, navigate, dispatch }) => {
           showCancelButton: "Not Now !!!",
           confirmButtonText: "Go Login !!!",
         }).then((rs) => {
-          if (rs.isConfirmed) navigate(`/${path.LOGIN}`);
+          if (rs.isConfirmed)
+            navigate({
+              pathname: path.LOGIN,
+              search: createSearchParams({
+                redirect: location.pathname,
+              }).toString(),
+            });
         });
       const response = await apiUpdateCart({
         pid: productsData?._id,
         color: productsData?.color,
+        quantity: 1,
+        price: productsData?.price,
+        thumbnail: productsData?.thumbnail,
+        title: productsData?.title,
       });
       if (response.success) {
         toast.success(response.message);

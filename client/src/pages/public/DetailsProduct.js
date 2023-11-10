@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createSearchParams, useParams } from "react-router-dom";
 import { apiGetProduct, apiGetProducts, apiUpdateCart } from "apis";
 import { Breadcrumb } from "components";
@@ -37,6 +37,7 @@ const DetailsProduct = ({
 }) => {
   const params = useParams();
   const { current } = useSelector((state) => state.user);
+  const titleRef = useRef();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [varriant, setVarriant] = useState(null);
@@ -81,8 +82,9 @@ const DetailsProduct = ({
       fetchProduct();
       fetchProducts();
     }
+    titleRef.current.scrollIntoView({ block: "start" });
     window.scrollTo(0, 0);
-  }, [pid]);
+  }, [pid, params.pid]);
 
   useEffect(() => {
     if (pid) {
@@ -104,8 +106,16 @@ const DetailsProduct = ({
         thumbnail: product?.varriants?.find((el) => el.SKU === varriant)
           ?.thumbnail,
       });
+    } else {
+      setcurrentProduct({
+        title: product?.title,
+        color: product?.color,
+        images: product?.images || [],
+        price: product?.price,
+        thumbnail: product?.thumbnail,
+      });
     }
-  }, [varriant, product?.varriants]);
+  }, [varriant, product]);
 
   const handeQuantity = useCallback(
     (number) => {
@@ -116,6 +126,7 @@ const DetailsProduct = ({
 
     [quantity]
   );
+
   const handlePlusMinus = useCallback(
     (flag) => {
       if (flag === "minus" && quantity === 1) return;
@@ -154,8 +165,11 @@ const DetailsProduct = ({
       });
     const response = await apiUpdateCart({
       pid: pid,
-      color: currentProduct.color,
+      color: currentProduct.color || product?.color,
       quantity,
+      price: currentProduct.price || product?.price,
+      thumbnail: currentProduct.thumbnail || product?.thumbnail,
+      title: currentProduct.title || product?.title,
     });
     if (response.success) {
       toast.success(response.message);
@@ -166,7 +180,7 @@ const DetailsProduct = ({
   return (
     <div onClick={(e) => e.stopPropagation()} className="w-full">
       {!isQuickView && (
-        <div className="w-main">
+        <div ref={titleRef} className="w-main">
           <h3 className="font-bold">
             {currentProduct?.title || product?.title}
           </h3>
@@ -284,6 +298,7 @@ const DetailsProduct = ({
                     "flex items-center gap-2 p-2 border cursor-pointer",
                     varriant === el.SKU && "border-main"
                   )}
+                  key={el.SKU}
                 >
                   <img
                     src={el?.thumbnail}

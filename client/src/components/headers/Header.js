@@ -49,7 +49,7 @@ const Header = ({ dispatch }) => {
           <>
             <div
               onClick={() => dispatch(showCart({ singal: true }))}
-              className="flex px-4 items-center justify-center gap-2 border-r"
+              className="flex cursor-pointer px-4 items-center justify-center gap-2 border-r"
             >
               <BsHandbagFill color="red" />
               <span className="text-[12px]">{`${
