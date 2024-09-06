@@ -277,3 +277,15 @@ export const blocked = [
     value: "ACTIVE",
   },
 ];
+
+export const statusOrders = [
+  {
+    label: "Cancelled",
+    value: "Cancelled",
+  },
+
+  {
+    label: "Successed",
+    value: "Successed",
+  },
+];

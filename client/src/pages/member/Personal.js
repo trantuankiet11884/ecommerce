@@ -7,8 +7,11 @@ import { avatarJoke } from "assets/js";
 import { apiUpdateCurrentUser } from "apis";
 import { getCurrent } from "store/user/asyncActions";
 import { toast } from "react-toastify";
+import { useSearchParams } from "react-router-dom";
+import { withNavigate } from "hocs";
 
-const Personal = () => {
+const Personal = ({ navigate }) => {
+  const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
   const {
     register,
@@ -18,7 +21,6 @@ const Personal = () => {
   } = useForm();
 
   const { current } = useSelector((state) => state.user);
-
   useEffect(() => {
     reset({
       firstName: current?.firstName,
@@ -26,6 +28,7 @@ const Personal = () => {
       mobile: current?.mobile,
       email: current?.email,
       avatar: current?.avatar,
+      address: current?.address,
     });
   }, []);
 
@@ -40,6 +43,7 @@ const Personal = () => {
     if (response.success) {
       dispatch(getCurrent());
       toast.success(response.message);
+      if (searchParams.get("redirect")) navigate(searchParams.get("redirect"));
     } else toast.error(response.message);
   };
 
@@ -63,51 +67,67 @@ const Personal = () => {
           </span>
         </div>
 
-        <InputForm
-          label="First Name"
-          register={register}
-          errors={errors}
-          id="firstName"
-          validate={{
-            required: "Required Fill !!!",
-          }}
-          fullWidth
-        />
-        <InputForm
-          label="Last Name"
-          register={register}
-          errors={errors}
-          id="lastName"
-          validate={{
-            required: "Required Fill !!!",
-          }}
-          fullWidth
-        />
-        <InputForm
-          label="Email"
-          register={register}
-          errors={errors}
-          id="email"
-          validate={{
-            required: "Required Fill !!!",
-          }}
-          fullWidth
-        />
-        <InputForm
-          label="Phone"
-          register={register}
-          errors={errors}
-          id="mobile"
-          validate={{
-            required: "Required Fill !!!",
-            pattern: {
-              value:
-                /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}$/gm,
-              message: "Phone Only 10 Numbers !!!",
-            },
-          }}
-          fullWidth
-        />
+        <div className="w-full flex gap-2 justify-center items-center">
+          <InputForm
+            label="First Name"
+            register={register}
+            errors={errors}
+            id="firstName"
+            validate={{
+              required: "Required Fill !!!",
+            }}
+            fullWidth
+          />
+          <InputForm
+            label="Last Name"
+            register={register}
+            errors={errors}
+            id="lastName"
+            validate={{
+              required: "Required Fill !!!",
+            }}
+            fullWidth
+          />
+        </div>
+        <div className="w-full flex gap-2 justify-center items-center">
+          <InputForm
+            label="Email"
+            register={register}
+            errors={errors}
+            id="email"
+            validate={{
+              required: "Required Fill !!!",
+            }}
+            fullWidth
+          />
+          <InputForm
+            label="Phone"
+            register={register}
+            errors={errors}
+            id="mobile"
+            validate={{
+              required: "Required Fill !!!",
+              pattern: {
+                value:
+                  /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4}$/gm,
+                message: "Phone Only 10 Numbers !!!",
+              },
+            }}
+            fullWidth
+          />
+        </div>
+        <div className="w-full flex justify-center items-center">
+          <InputForm
+            label="Address"
+            register={register}
+            errors={errors}
+            id="address"
+            validate={{
+              required: "Required Fill !!!",
+            }}
+            fullWidth
+          />
+        </div>
 
         {isDirty && (
           <div className="flex justify-center items-center">
@@ -134,4 +154,4 @@ const Personal = () => {
   );
 };
 
-export default memo(Personal);
+export default withNavigate(memo(Personal));

@@ -56,6 +56,11 @@ const getProducts = asyncHandler(async (req, res) => {
       $regex: queries.category,
       $options: "i",
     };
+  if (queries?.brand)
+    formatedQueries.brand = {
+      $regex: queries.brand,
+      $options: "i",
+    };
   if (queries?.color) {
     delete formatedQueries.color;
     const colorArr = queries.color?.split(",");
@@ -86,7 +91,6 @@ const getProducts = asyncHandler(async (req, res) => {
       ],
     };
   }
-
   const qr = { ...colorQueryObj, ...formatedQueries, ...queryObj };
 
   let queryCommand = Product.find(qr);

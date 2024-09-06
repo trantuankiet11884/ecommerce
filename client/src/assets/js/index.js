@@ -5,4 +5,5 @@ import news from "../images/new.png";
 import banner1 from "../images/banner1-home2_2000x_crop_center.png";
 import banner2 from "../images/banner2-home2_2000x_crop_center.png";
 import avatarJoke from "../images/avatarjoke.png";
-export { logo, banner, trending, news, banner1, banner2, avatarJoke };
+import payment from "../images/payment.svg";
+export { logo, banner, trending, news, banner1, banner2, avatarJoke, payment };

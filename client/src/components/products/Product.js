@@ -6,7 +6,7 @@ import icons from "utils/icons";
 import { withNavigate } from "hocs";
 import { showModal } from "store/app/appSlice";
 import { DetailsProduct } from "pages/public";
-import { apiUpdateCart } from "apis";
+import { apiAddWishlist, apiUpdateCart } from "apis";
 import { toast } from "react-toastify";
 import { getCurrent } from "store/user/asyncActions";
 import { useSelector } from "react-redux";
@@ -23,6 +23,7 @@ const Product = ({
   navigate,
   dispatch,
   location,
+  pid,
 }) => {
   const { current } = useSelector((state) => state.user);
   const [isShowOption, setIsShowOption] = useState(false);
@@ -61,7 +62,14 @@ const Product = ({
         dispatch(getCurrent());
       } else toast.error(response.message);
     }
-    if (option === "wishlist") console.log("wishlist");
+    if (option === "wishlist") {
+      const response = await apiAddWishlist(pid);
+      if (response.success) {
+        dispatch(getCurrent());
+        toast.success(response.mes);
+      } else
+        toast.error("You have must login before add product to your wishlist!");
+    }
     if (option === "view") {
       dispatch(
         showModal({
@@ -85,9 +93,7 @@ const Product = ({
       <div
         onClick={() =>
           navigate(
-            `/${productsData?.category.toLowerCase()}/${productsData?._id}/${
-              productsData?.title
-            }`
+            `/${productsData?.category}/${productsData?._id}/${productsData?.title}`
           )
         }
         className="w-full p-4 flex-col items-center cursor-pointer"
@@ -125,7 +131,17 @@ const Product = ({
                 title="Add to Wishlist"
                 onClick={(e) => handleClickOptions(e, "wishlist")}
               >
-                <SelectOption icon={<BsFillSuitHeartFill />} />
+                <SelectOption
+                  icon={
+                    <BsFillSuitHeartFill
+                      color={
+                        current?.wishList?.some((i) => i === pid)
+                          ? "pink"
+                          : "black"
+                      }
+                    />
+                  }
+                />
               </span>
             </div>
           )}

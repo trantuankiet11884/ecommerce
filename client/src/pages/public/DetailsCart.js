@@ -4,10 +4,35 @@ import { withNavigate } from "hocs";
 import { useSelector } from "react-redux";
 import { formatMoney } from "utils/fn";
 import path from "utils/path";
-import { Link } from "react-router-dom";
+import { Link, createSearchParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
-const DetailsCart = ({ location }) => {
-  const { currentCart } = useSelector((state) => state.user);
+const DetailsCart = ({ location, navigate }) => {
+  const { currentCart, current } = useSelector((state) => state.user);
+
+  const handleSubmit = async () => {
+    if (!current?.address)
+      return Swal.fire({
+        icon: "info",
+        title: "Almost!",
+        text: "Your have must address before checkout, plsss !!!",
+        showCancelButton: true,
+        showConfirmButton: true,
+        confirmButtonText: "Go Update",
+        cancelButtonText: "Cancel",
+      }).then((rs) => {
+        if (rs.isConfirmed)
+          navigate({
+            pathname: `/${path.MEMBER}/${path.PERSONAL}`,
+            search: createSearchParams({
+              redirect: location.pathname,
+            }).toString(),
+          });
+      });
+    else {
+      window.open(`/${path.CHECKOUT}`, "_blank");
+    }
+  };
   return (
     <div className="w-main">
       <div>
@@ -49,13 +74,14 @@ const DetailsCart = ({ location }) => {
             </span>
           </p>
           <div className="text-end my-3">
-            <Link
+            <Button onOk={handleSubmit}>Checkout</Button>
+            {/* <Link
               to={`/${path.CHECKOUT}`}
               target="_blank"
               className="px-4 py-2 border bg-main text-white rounded-lg"
             >
               Checkout
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

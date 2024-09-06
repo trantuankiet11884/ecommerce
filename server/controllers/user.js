@@ -46,7 +46,7 @@ const register = asyncHandler(async (req, res) => {
       mobile,
     });
     if (newUser) {
-      const html = ` <h2>Register code :</h2> </br><blockquote>${token}</blockquote>`;
+      const html = `<h2>Register code :</h2> </br><blockquote>${token}</blockquote>`;
       await sendMail(email, html, "Confirm Register Account");
     }
     setTimeout(async () => {
@@ -111,9 +111,10 @@ const login = asyncHandler(async (req, res) => {
       success: true,
       userData,
       accessToken,
+      message: "Login Successfully",
     });
   } else {
-    throw new Error("Invalid credentials!!!");
+    throw new Error("Email or Password is wrong...!!!");
   }
 });
 
@@ -124,7 +125,8 @@ const getCurrent = asyncHandler(async (req, res) => {
     .populate({
       path: "cart",
       populate: { path: "product", select: "id title thumbnail price" },
-    });
+    })
+    .populate("wishList", "title thumbnail price color");
 
   return res.status(200).json({
     success: user ? true : false,
@@ -334,8 +336,8 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.user;
-  const { firstName, lastName, email, mobile } = req.body;
-  const data = { firstName, lastName, email, mobile };
+  const { firstName, lastName, email, mobile, address } = req.body;
+  const data = { firstName, lastName, email, mobile, address };
 
   if (req.file) data.avatar = req.file.path;
 
@@ -464,8 +466,43 @@ const removeCart = asyncHandler(async (req, res) => {
   });
 });
 
+const updatedWishlist = asyncHandler(async (req, res) => {
+  const { pid } = req.params;
+  const { id } = req.user;
+  const user = await User.findById(id);
+
+  const alreadyInWishlist = user.wishList?.find((el) => el.toString() === pid);
+
+  if (alreadyInWishlist) {
+    const response = await User.findByIdAndUpdate(
+      id,
+      { $pull: { wishList: pid } },
+      { new: true }
+    );
+    return res.json({
+      success: response ? true : false,
+      message: response
+        ? "Updated your wishlist !!! "
+        : "Something went wrongs...",
+    });
+  } else {
+    const response = await User.findByIdAndUpdate(
+      id,
+      { $push: { wishList: pid } },
+      { new: true }
+    );
+    return res.json({
+      success: response ? true : false,
+      message: response
+        ? "Updated your wishlist !!! "
+        : "Something went wrongs...",
+    });
+  }
+});
+
 module.exports = {
   register,
+  updatedWishlist,
   finalRegister,
   login,
   getCurrent,

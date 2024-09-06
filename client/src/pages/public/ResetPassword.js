@@ -25,7 +25,9 @@ const ResetPassword = () => {
             className=" text-sm border-4 text-white py-1 px-2 rounded"
             name="Submit"
             onOk={handleResetPassword}
-          ></Button>
+          >
+            Submit
+          </Button>
         </div>
       </form>
     </div>

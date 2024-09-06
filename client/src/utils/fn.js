@@ -12,7 +12,7 @@ export const createSlug = (string) => {
 
 export const formatMoney = (number) => {
   if (typeof number !== "number") {
-    return ""; // or some default value or an error message
+    return "";
   }
   return Number(number.toFixed(1)).toLocaleString();
 };

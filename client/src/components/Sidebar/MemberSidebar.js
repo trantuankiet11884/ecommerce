@@ -5,6 +5,7 @@ import { memberNavLink } from "utils/constant";
 import clsx from "clsx";
 import { AiOutlineCaretDown, AiOutlineCaretRight } from "react-icons/ai";
 import { useSelector } from "react-redux";
+import { LuForward } from "react-icons/lu";
 
 const activedStyle = "px-4 py-2 flex items-center gap-2 bg-gray-500";
 const notActiveStlye = "px-4 py-2 flex items-center gap-2 hover:bg-gray-400";
@@ -85,7 +86,9 @@ const MemberSidebar = () => {
           </Fragment>
         ))}
         <NavLink to={`/`} className={clsx(notActiveStlye)}>
-          <span>Go Home !!!</span>
+          <span className="flex gap-2">
+            <LuForward size={18} /> Go Home !!!
+          </span>
         </NavLink>
       </div>
     </div>

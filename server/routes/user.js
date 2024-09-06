@@ -17,6 +17,7 @@ router.put("/current", [verifyAT], uploader.single("avatar"), ctrls.updateUser);
 router.put("/address", [verifyAT], ctrls.updateUserAddress);
 router.put("/cart", [verifyAT], ctrls.updateCart);
 router.delete("/remove-cart/:pid/:color", [verifyAT], ctrls.removeCart);
+router.put("/wishlist/:pid", [verifyAT], ctrls.updatedWishlist);
 router.put("/:uid", [verifyAT, isAdmin], ctrls.updateUserByAdmin);
 
 module.exports = router;

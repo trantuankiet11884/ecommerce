@@ -32,7 +32,8 @@ const Products = () => {
   const [params] = useSearchParams();
 
   const fetchProductsByCategory = async (queries) => {
-    const response = await apiGetProducts({ ...queries, category });
+    if (category && category !== "products") queries.category = category;
+    const response = await apiGetProducts(queries);
     if (response.success) setProducts(response);
   };
 
@@ -121,7 +122,7 @@ const Products = () => {
         >
           {products?.products?.map((product) => (
             <div className="border" key={product.id}>
-              <Product pid={product.id} productsData={product} normal={true} />
+              <Product pid={product._id} productsData={product} normal={true} />
             </div>
           ))}
         </Masonry>

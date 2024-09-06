@@ -21,7 +21,7 @@ const configPersitUser = {
 
 const userConfig = {
   ...configPersitUser,
-  whiteList: ["isLoggedIn", "token", "current"],
+  whiteList: ["isLoggedIn", "token", "current", "currentCart"],
 };
 
 export const store = configureStore({

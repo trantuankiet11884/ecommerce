@@ -78,6 +78,7 @@ const Login = () => {
             searchParams.get("redirect")
               ? navigate(searchParams.get("redirect"))
               : navigate(`/${path.HOME}`);
+            toast.success(response.message);
           } else {
             Swal.fire("Oops !!!", response.message, "error");
           }

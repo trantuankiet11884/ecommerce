@@ -3,7 +3,6 @@ import { createSearchParams, useParams } from "react-router-dom";
 import { apiGetProduct, apiGetProducts, apiUpdateCart } from "apis";
 import { Breadcrumb } from "components";
 import ReactImageMagnify from "react-image-magnify";
-
 import Slider from "react-slick";
 import { formatMoney, formatPrice, renderStar } from "utils/fn";
 import Button from "components/buttons/Button";
@@ -82,8 +81,8 @@ const DetailsProduct = ({
       fetchProduct();
       fetchProducts();
     }
-    titleRef.current.scrollIntoView({ block: "start" });
     window.scrollTo(0, 0);
+    titleRef.current.scrollIntoView({ block: "center" });
   }, [pid, params.pid]);
 
   useEffect(() => {
@@ -180,8 +179,8 @@ const DetailsProduct = ({
   return (
     <div onClick={(e) => e.stopPropagation()} className="w-full">
       {!isQuickView && (
-        <div ref={titleRef} className="w-main">
-          <h3 className="font-bold">
+        <div className="w-main">
+          <h3 ref={titleRef} className="font-bold">
             {currentProduct?.title || product?.title}
           </h3>
           <Breadcrumb

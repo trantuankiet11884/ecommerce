@@ -55,7 +55,7 @@ function App() {
         <Route path={path.PUBLIC} element={<Public />}>
           <Route path={path.HOME} element={<Home />}></Route>
           <Route path={path.LOGIN} element={<Login />}></Route>
-          <Route path={path.PRODUCTS} element={<Products />}></Route>
+          <Route path={path.PRODUCTS_CATEGORY} element={<Products />}></Route>
           <Route path={path.BLOGS} element={<Blogs />}></Route>
           <Route path={path.FAQ} element={<FAQs />}></Route>
           <Route path={path.OUR_SERVICES} element={<Services />}></Route>

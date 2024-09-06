@@ -13,11 +13,12 @@ const DealDaily = () => {
 
   const fetchDealDaily = async () => {
     const response = await apiGetProducts({
-      limit: 1,
-      page: Math.round(Math.random() * 10),
+      limit: 20,
+      sort: "-totalRatings",
     });
+
     if (response.success) {
-      setDealdaily(response.products[0]);
+      setDealdaily(response.products[Math.round(Math.random() * 20)]);
 
       const now = DateTime.now().setZone("Asia/Ho_Chi_Minh");
       const endOfDay = now.endOf("day");
@@ -62,7 +63,7 @@ const DealDaily = () => {
           className="w-[200px] h-[200px] object-cover"
         />
         <span
-          className="line-clamp-1 text-center"
+          className="line-clamp-1 text-center text-sm font-semibold"
           key={`title_${dealdaily?.id}`}
         >
           {dealdaily?.title}
